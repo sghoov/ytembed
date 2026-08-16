@@ -246,7 +246,11 @@
       isRunning = false;
     }, 10000);
   }
-
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.event === 'trigger_tv_prompt') {
+    runSequence();
+  }
+});
   // Listen for StreamElements Realtime Trigger
   window.addEventListener('onWidgetCustom', function (obj) {
     if (obj.detail && obj.detail.event === 'trigger_tv_prompt') {
