@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>YouTube TV Loop Test - Custom Avatar</title>
+  <title>YouTube TV Animated Lower Third Overlay</title>
   <style>
     * {
       box-sizing: border-box;
@@ -11,7 +11,7 @@
     }
 
     body {
-      background: #111; /* Simulated dark stream background */
+      background: transparent; /* Fully transparent for PRISM overlay */
       font-family: 'YouTube Noto', 'Roboto', 'Segoe UI', sans-serif;
       overflow: hidden;
       width: 100vw;
@@ -94,178 +94,4 @@
       color: #0f0f0f !important;
       border-color: #ffffff;
       transform: scale(1.15);
-      box-shadow: 0 0 25px 5px rgba(255, 255, 255, 0.9), 0 0 50px rgba(255, 255, 255, 0.5);
-      z-index: 10;
-    }
-
-    .tv-btn.focused svg {
-      fill: #0f0f0f !important;
-    }
-
-    /* Active / Clicked States */
-    .tv-btn.liked {
-      background: rgba(255, 255, 255, 0.3);
-      color: #3ea6ff;
-    }
-
-    .tv-btn.liked svg {
-      fill: #3ea6ff;
-    }
-
-    .tv-btn.subscribed {
-      background: #cc0000;
-      color: #ffffff;
-    }
-
-    /* Controls */
-    .controls-panel {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .test-btn {
-      padding: 10px 18px;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .test-btn.stop {
-      background: #dc2626;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="controls-panel">
-    <button class="test-btn" id="toggleBtn" onclick="toggleLoop()">▶ Start Loop</button>
-  </div>
-
-  <div class="yt-tv-player-bar" id="tvBar">
-    
-    <div class="section">
-      <img src="image.png" alt="Channel Badge" class="channel-avatar" id="avatarImg" onerror="this.src='https://via.placeholder.com/42/cc0000/ffffff?text=SDT'">
-      <div class="tv-btn">Papa Gigs</div>
-      <div class="tv-btn" id="subBtn">
-        <span id="subText">Subscribe</span>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="tv-btn tv-btn-icon">
-        <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
-      </div>
-      <div class="tv-btn tv-btn-icon">
-        <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-      </div>
-      <div class="tv-btn tv-btn-icon">
-        <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="tv-btn tv-btn-icon" id="likeBtn">
-        <svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.58 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
-      </div>
-      
-      <div class="tv-btn tv-btn-icon">
-        <svg viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
-      </div>
-
-      <div class="tv-btn tv-btn-icon">
-        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    let isLooping = false;
-    let sequenceTimeouts = [];
-
-    function toggleLoop() {
-      const toggleBtn = document.getElementById('toggleBtn');
-      
-      if (isLooping) {
-        // Stop Loop
-        isLooping = false;
-        toggleBtn.innerText = '▶ Start Loop';
-        toggleBtn.classList.remove('stop');
-        clearAllTimeouts();
-        
-        // Hide bar immediately
-        const tvBar = document.getElementById('tvBar');
-        tvBar.classList.remove('show');
-      } else {
-        // Start Loop
-        isLooping = true;
-        toggleBtn.innerText = '⏹ Stop Loop';
-        toggleBtn.classList.add('stop');
-        runSequence();
-      }
-    }
-
-    function clearAllTimeouts() {
-      sequenceTimeouts.forEach(t => clearTimeout(t));
-      sequenceTimeouts = [];
-    }
-
-    function runSequence() {
-      if (!isLooping) return;
-
-      const tvBar = document.getElementById('tvBar');
-      const likeBtn = document.getElementById('likeBtn');
-      const subBtn = document.getElementById('subBtn');
-      const subText = document.getElementById('subText');
-
-      // Reset UI elements
-      tvBar.classList.remove('show');
-      likeBtn.classList.remove('focused', 'liked');
-      subBtn.classList.remove('focused', 'subscribed');
-      subText.innerText = 'Subscribe';
-
-      const schedule = (fn, delay) => {
-        sequenceTimeouts.push(setTimeout(fn, delay));
-      };
-
-      // 1. Slide In
-      schedule(() => tvBar.classList.add('show'), 200);
-
-      // 2. High-glow focus on Like Button
-      schedule(() => likeBtn.classList.add('focused'), 1000);
-
-      // 3. Click Like Button
-      schedule(() => {
-        likeBtn.classList.remove('focused');
-        likeBtn.classList.add('liked');
-      }, 1800);
-
-      // 4. Move Focus over to Subscribe Button
-      schedule(() => subBtn.classList.add('focused'), 2600);
-
-      // 5. Click Subscribe Button
-      schedule(() => {
-        subBtn.classList.remove('focused');
-        subBtn.classList.add('subscribed');
-        subText.innerText = 'Subscribed';
-      }, 3400);
-
-      // 6. Slide Out
-      schedule(() => tvBar.classList.remove('show'), 5200);
-
-      // 7. Pause off-screen, then loop
-      schedule(() => {
-        if (isLooping) {
-          runSequence();
-        }
-      }, 6500);
-    }
-  </script>
-</body>
-</html>
+      box-shadow: 0 0 25px 5px rgba(255, 255, 255, 0.9
