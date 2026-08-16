@@ -56,7 +56,7 @@
       padding: 8px 16px;
       font-size: 14px;
       font-weight: 500;
-      transition: all 0.2s ease-in-out;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     /* Channel Avatar Icon Styling */
@@ -79,9 +79,10 @@
       width: 20px;
       height: 20px;
       fill: #ffffff;
+      transition: fill 0.2s ease;
     }
 
-    /* Selection Glow Effect */
+    /* Standard Selection Glow Effect */
     .tv-btn.focused {
       background: #ffffff !important;
       color: #0f0f0f !important;
@@ -95,10 +96,29 @@
       fill: #0f0f0f !important;
     }
 
+    /* MEGA FOCUS: 3x Scale Up for Like Button */
+    #likeBtn.focused {
+      transform: scale(3) !important; /* Scaled 3x larger */
+      box-shadow: 0 0 45px 12px rgba(255, 255, 255, 1), 0 0 90px rgba(255, 255, 255, 0.8) !important;
+      z-index: 50; /* Keeps it layered above everything else */
+    }
+
+    /* Click Pop Effect on 3x Base */
+    @keyframes megaPop {
+      0% { transform: scale(3); }
+      50% { transform: scale(3.5); }
+      100% { transform: scale(2.2); }
+    }
+
+    .tv-btn.popping {
+      animation: megaPop 0.35s ease-out forwards;
+    }
+
     /* Active / Clicked States */
     .tv-btn.liked {
       background: rgba(255, 255, 255, 0.3);
       color: #3ea6ff;
+      transform: scale(2.2); /* Settles at 2.2x after click */
     }
 
     .tv-btn.liked svg {
@@ -155,7 +175,7 @@
     function clearFocus() {
       ['rwBtn', 'playBtn', 'ffBtn', 'likeBtn', 'subBtn'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.classList.remove('focused');
+        if (el) el.classList.remove('focused', 'popping');
       });
     }
 
@@ -178,26 +198,31 @@
       setTimeout(() => { clearFocus(); playBtn.classList.add('focused'); }, 600);
       setTimeout(() => { clearFocus(); ffBtn.classList.add('focused'); }, 1000);
 
-      // 2. Highlight and Click "Like"
+      // 2. Roll over to "Like" (3x Scale Up)
       setTimeout(() => { clearFocus(); likeBtn.classList.add('focused'); }, 1500);
-      setTimeout(() => { likeBtn.classList.add('liked'); }, 2100);
 
-      // 3. Scroll back left toward Subscribe
+      // 3. Click "Like" (Pop up to 3.5x then settle at 2.2x)
+      setTimeout(() => { 
+        likeBtn.classList.add('popping');
+        likeBtn.classList.add('liked'); 
+      }, 2100);
+
+      // 4. Scroll back left toward Subscribe
       setTimeout(() => { clearFocus(); ffBtn.classList.add('focused'); }, 2700);
       setTimeout(() => { clearFocus(); playBtn.classList.add('focused'); }, 3100);
       setTimeout(() => { clearFocus(); rwBtn.classList.add('focused'); }, 3500);
 
-      // 4. Highlight and Click "Subscribe"
+      // 5. Highlight and Click "Subscribe"
       setTimeout(() => { clearFocus(); subBtn.classList.add('focused'); }, 4000);
       setTimeout(() => {
         subBtn.classList.add('subscribed');
         subText.innerText = 'Subscribed';
       }, 4600);
 
-      // 5. Clear outline
+      // 6. Clear focus outline
       setTimeout(() => clearFocus(), 5400);
 
-      // 6. Restart loop sequence
+      // 7. Restart loop sequence
       setTimeout(runLoopSequence, 7000);
     }
 
