@@ -171,63 +171,88 @@
 
   </div>
 
-  <script>
-    function clearFocus() {
-      ['rwBtn', 'playBtn', 'ffBtn', 'likeBtn', 'subBtn'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('focused', 'popping');
-      });
+ <script>
+  let sequenceTimeouts = [];
+  let isRunning = false;
+
+  function clearFocus() {
+    ['rwBtn', 'playBtn', 'ffBtn', 'likeBtn', 'subBtn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('focused', 'popping');
+    });
+  }
+
+  function runSequence() {
+    if (isRunning) return; // Prevent double-triggering
+    isRunning = true;
+
+    const tvBar = document.getElementById('tvBar');
+    const rwBtn = document.getElementById('rwBtn');
+    const playBtn = document.getElementById('playBtn');
+    const ffBtn = document.getElementById('ffBtn');
+    const likeBtn = document.getElementById('likeBtn');
+    const subBtn = document.getElementById('subBtn');
+    const subText = document.getElementById('subText');
+
+    // Reset initial state
+    clearFocus();
+    likeBtn.classList.remove('liked');
+    subBtn.classList.remove('subscribed');
+    subText.innerText = 'Subscribe';
+
+    const schedule = (fn, delay) => {
+      sequenceTimeouts.push(setTimeout(fn, delay));
+    };
+
+    // 1. Slide Bar In
+    schedule(() => tvBar.classList.add('show'), 200);
+
+    // 2. Playback Controls Navigation
+    schedule(() => { clearFocus(); rwBtn.classList.add('focused'); }, 1000);
+    schedule(() => { clearFocus(); playBtn.classList.add('focused'); }, 1400);
+    schedule(() => { clearFocus(); ffBtn.classList.add('focused'); }, 1800);
+
+    // 3. Roll over to "Like" (3x Scale Up)
+    schedule(() => { clearFocus(); likeBtn.classList.add('focused'); }, 2300);
+
+    // 4. Click "Like" (Pop up to 3.5x then settle)
+    schedule(() => { 
+      likeBtn.classList.add('popping');
+      likeBtn.classList.add('liked'); 
+    }, 2900);
+
+    // 5. Scroll back left toward Subscribe
+    schedule(() => { clearFocus(); ffBtn.classList.add('focused'); }, 3700);
+    schedule(() => { clearFocus(); playBtn.classList.add('focused'); }, 4100);
+    schedule(() => { clearFocus(); rwBtn.classList.add('focused'); }, 4500);
+
+    // 6. Highlight and Click "Subscribe"
+    schedule(() => { clearFocus(); subBtn.classList.add('focused'); }, 5100);
+    schedule(() => {
+      subBtn.classList.add('subscribed');
+      subText.innerText = 'Subscribed';
+    }, 5700);
+
+    // 7. Clear focus outline
+    schedule(() => clearFocus(), 6500);
+
+    // 8. Slide Bar Back Off-Screen at ~9.5 Seconds
+    schedule(() => {
+      tvBar.classList.remove('show');
+    }, 9500);
+
+    // 9. Reset trigger state at 10 Seconds
+    schedule(() => {
+      isRunning = false;
+    }, 10000);
+  }
+
+  // Listen for StreamElements Realtime Trigger
+  window.addEventListener('onWidgetCustom', function (obj) {
+    if (obj.detail && obj.detail.event === 'trigger_tv_prompt') {
+      runSequence();
     }
-
-    function runLoopSequence() {
-      const rwBtn = document.getElementById('rwBtn');
-      const playBtn = document.getElementById('playBtn');
-      const ffBtn = document.getElementById('ffBtn');
-      const likeBtn = document.getElementById('likeBtn');
-      const subBtn = document.getElementById('subBtn');
-      const subText = document.getElementById('subText');
-
-      // Reset states
-      clearFocus();
-      likeBtn.classList.remove('liked');
-      subBtn.classList.remove('subscribed');
-      subText.innerText = 'Subscribe';
-
-      // 1. Step through Playback Controls
-      setTimeout(() => { clearFocus(); rwBtn.classList.add('focused'); }, 200);
-      setTimeout(() => { clearFocus(); playBtn.classList.add('focused'); }, 600);
-      setTimeout(() => { clearFocus(); ffBtn.classList.add('focused'); }, 1000);
-
-      // 2. Roll over to "Like" (3x Scale Up)
-      setTimeout(() => { clearFocus(); likeBtn.classList.add('focused'); }, 1500);
-
-      // 3. Click "Like" (Pop up to 3.5x then settle at 2.2x)
-      setTimeout(() => { 
-        likeBtn.classList.add('popping');
-        likeBtn.classList.add('liked'); 
-      }, 2100);
-
-      // 4. Scroll back left toward Subscribe
-      setTimeout(() => { clearFocus(); ffBtn.classList.add('focused'); }, 2700);
-      setTimeout(() => { clearFocus(); playBtn.classList.add('focused'); }, 3100);
-      setTimeout(() => { clearFocus(); rwBtn.classList.add('focused'); }, 3500);
-
-      // 5. Highlight and Click "Subscribe"
-      setTimeout(() => { clearFocus(); subBtn.classList.add('focused'); }, 4000);
-      setTimeout(() => {
-        subBtn.classList.add('subscribed');
-        subText.innerText = 'Subscribed';
-      }, 4600);
-
-      // 6. Clear focus outline
-      setTimeout(() => clearFocus(), 5400);
-
-      // 7. Restart loop sequence
-      setTimeout(runLoopSequence, 7000);
-    }
-
-    // Auto-start on load
-    runLoopSequence();
-  </script>
+  });
+</script>
 </body>
 </html>
