@@ -20,9 +20,11 @@
       justify-content: center;
       align-items: flex-end;
       padding-bottom: 50px;
+      /* Disable all pointer events so touch/clicks pass right through to PRISM */
+      pointer-events: none; 
     }
 
-    /* Overall TV Navigation Bar - Hidden by default */
+    /* Overall TV Navigation Bar - ALWAYS VISIBLE NOW */
     .yt-tv-player-bar {
       display: flex;
       align-items: center;
@@ -35,15 +37,8 @@
       border-radius: 40px;
       border: 1px solid rgba(255, 255, 255, 0.15);
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-      transform: translateY(180px);
-      opacity: 1;
-      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
-    }
-
-    /* Slide Up State */
-    .yt-tv-player-bar.show {
-      transform: translateY(0);
-      opacity: 1;
+      transform: translateY(0); /* On screen immediately */
+      opacity: 1; /* Fully visible immediately */
     }
 
     .section {
@@ -181,8 +176,6 @@
 
   <script>
     let sequenceTimeouts = [];
-    let isRunning = false;
-    let isRemoteLoopActive = false;
 
     function clearFocus() {
       ['rwBtn', 'playBtn', 'ffBtn', 'likeBtn', 'subBtn'].forEach(id => {
@@ -191,15 +184,8 @@
       });
     }
 
-    function clearAllTimeouts() {
-      sequenceTimeouts.forEach(t => clearTimeout(t));
-      sequenceTimeouts = [];
-    }
-
     // Continuous Remote Scrolling Loop
     function runRemoteLoop() {
-      if (!isRemoteLoopActive) return;
-
       const rwBtn = document.getElementById('rwBtn');
       const playBtn = document.getElementById('playBtn');
       const ffBtn = document.getElementById('ffBtn');
@@ -207,7 +193,7 @@
       const subBtn = document.getElementById('subBtn');
       const subText = document.getElementById('subText');
 
-      // Reset states at start of loop cycle
+      // Reset states
       clearFocus();
       likeBtn.classList.remove('liked');
       subBtn.classList.remove('subscribed');
@@ -218,29 +204,27 @@
       };
 
       // 1. Step through Playback Controls
-      schedule(() => { if (!isRemoteLoopActive) return; clearFocus(); rwBtn.classList.add('focused'); }, 200);
-      schedule(() => { if (!isRemoteLoopActive) return; clearFocus(); playBtn.classList.add('focused'); }, 500);
-      schedule(() => { if (!isRemoteLoopActive) return; clearFocus(); ffBtn.classList.add('focused'); }, 800);
+      schedule(() => { clearFocus(); rwBtn.classList.add('focused'); }, 200);
+      schedule(() => { clearFocus(); playBtn.classList.add('focused'); }, 500);
+      schedule(() => { clearFocus(); ffBtn.classList.add('focused'); }, 800);
 
       // 2. Roll over to "Like" (3x Scale Up)
-      schedule(() => { if (!isRemoteLoopActive) return; clearFocus(); likeBtn.classList.add('focused'); }, 1200);
+      schedule(() => { clearFocus(); likeBtn.classList.add('focused'); }, 1200);
 
       // 3. Click "Like" (Pop and turn blue)
       schedule(() => { 
-        if (!isRemoteLoopActive) return;
         likeBtn.classList.add('popping');
         likeBtn.classList.add('liked'); 
       }, 1600);
 
       // 4. Scroll back left toward Subscribe
-      schedule(() => { if (!isRemoteLoopActive) return; clearFocus(); ffBtn.classList.add('focused'); }, 2100);
-      schedule(() => { if (!isRemoteLoopActive) return; clearFocus(); playBtn.classList.add('focused'); }, 2400);
-      schedule(() => { if (!isRemoteLoopActive) return; clearFocus(); rwBtn.classList.add('focused'); }, 2700);
+      schedule(() => { clearFocus(); ffBtn.classList.add('focused'); }, 2100);
+      schedule(() => { clearFocus(); playBtn.classList.add('focused'); }, 2400);
+      schedule(() => { clearFocus(); rwBtn.classList.add('focused'); }, 2700);
 
       // 5. Highlight and Click "Subscribe"
-      schedule(() => { if (!isRemoteLoopActive) return; clearFocus(); subBtn.classList.add('focused'); }, 3100);
+      schedule(() => { clearFocus(); subBtn.classList.add('focused'); }, 3100);
       schedule(() => {
-        if (!isRemoteLoopActive) return;
         subBtn.classList.add('subscribed');
         subText.innerText = 'Subscribed';
       }, 3500);
@@ -248,53 +232,12 @@
       // 6. Clear focus outline briefly and repeat
       schedule(() => clearFocus(), 4000);
       schedule(() => {
-        if (isRemoteLoopActive) runRemoteLoop();
+        runRemoteLoop();
       }, 4500);
     }
 
-    // Triggered Master 10-Second Sequence
-    function triggerPrompt() {
-      if (isRunning) return; // Ignore if already playing
-      isRunning = true;
-      isRemoteLoopActive = true;
-      clearAllTimeouts();
-
-      const tvBar = document.getElementById('tvBar');
-
-      // 1. Slide Up onto screen
-      tvBar.classList.add('show');
-
-      // 2. Start continuous remote navigation loop
-      runRemoteLoop();
-
-      // 3. Slide Back Down at 9.5 seconds
-      setTimeout(() => {
-        isRemoteLoopActive = false;
-        clearFocus();
-        tvBar.classList.remove('show');
-      }, 9500);
-
-      // 4. Reset lock state at 10 seconds
-      setTimeout(() => {
-        isRunning = false;
-      }, 10000);
-    }
-
-    // Listener for StreamElements Direct Trigger & PostMessage
-    window.addEventListener('onWidgetCustom', function (obj) {
-      if (obj.detail && obj.detail.event === 'trigger_tv_prompt') {
-        triggerPrompt();
-      }
-    });
-
-    window.addEventListener('message', function(event) {
-      if (event.data && event.data.event === 'trigger_tv_prompt') {
-        triggerPrompt();
-      }
-    });
-
-    // Backup test trigger: Click anywhere on screen to test manually in browser
-    document.addEventListener('click', triggerPrompt);
+    // Auto-start immediately on page load
+    runRemoteLoop();
   </script>
 </body>
 </html>
