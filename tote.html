@@ -37,7 +37,6 @@
       overflow: hidden;
     }
 
-    /* Container with Rotating Conic Glow */
     .tote-container {
       position: relative;
       width: 480px;
@@ -50,7 +49,6 @@
       overflow: hidden;
     }
 
-    /* Moving Border Gradient Layer */
     .tote-container::before {
       content: '';
       position: absolute;
@@ -69,7 +67,6 @@
       z-index: 0;
     }
 
-    /* Inner Background Mask */
     .tote-container::after {
       content: '';
       position: absolute;
@@ -84,7 +81,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Bring Content Above Mask */
     .tote-header,
     .hero-section,
     .stats-grid,
@@ -94,7 +90,6 @@
       z-index: 2;
     }
 
-    /* Header & Logo */
     .tote-header {
       display: flex;
       justify-content: space-between;
@@ -166,7 +161,6 @@
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
     }
 
-    /* Hero Total Panel */
     .hero-section {
       background: rgba(0, 0, 0, 0.3);
       border: 1px solid var(--accent-color);
@@ -207,7 +201,6 @@
       color: var(--text-main);
     }
 
-    /* Stats Grid */
     .stats-grid {
       display: flex;
       justify-content: space-between;
@@ -238,7 +231,6 @@
       color: var(--text-main);
     }
 
-    /* Platform Breakdown */
     .apps-breakdown {
       background: rgba(0, 0, 0, 0.2);
       border: 1px solid var(--border-color);
@@ -291,7 +283,6 @@
       display: block;
     }
 
-    /* Footer */
     .tote-footer {
       display: flex;
       justify-content: space-between;
@@ -304,7 +295,6 @@
 <body>
 
   <div class="tote-container">
-    <!-- Header with logo.jpg -->
     <div class="tote-header">
       <div class="brand-left">
         <img src="logo.jpg" alt="Papa Gigs Logo" class="brand-logo" onerror="this.style.display='none'">
@@ -319,7 +309,6 @@
       </div>
     </div>
 
-    <!-- Main Shift Earnings -->
     <div class="hero-section">
       <div class="hero-label">Shift Earnings Total</div>
       <div class="hero-value" id="gross-earnings">$0.00</div>
@@ -330,7 +319,6 @@
       </div>
     </div>
 
-    <!-- Metrics Grid -->
     <div class="stats-grid">
       <div class="stat-box">
         <div class="stat-label">$/HOUR</div>
@@ -346,7 +334,6 @@
       </div>
     </div>
 
-    <!-- Platform Breakdown -->
     <div class="apps-breakdown">
       <div class="apps-header">
         <span>Platform Split</span>
@@ -368,7 +355,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="tote-footer">
       <span>UPDATED: <span id="last-updated">--:--</span></span>
       <span>PAPA GIGS TELEMETRY</span>
@@ -376,8 +362,8 @@
   </div>
 
   <script>
-    // Set your Dropbox Direct Link here (ending with dl=1)
-    const DROPBOX_JSON_URL = 'https://www.dropbox.com/scl/fi/YOUR_FILE_ID/tote.json?rlkey=YOUR_KEY&dl=1';
+    // Direct link to your Dropbox tote.json
+    const DROPBOX_JSON_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&st=dmju96kf&raw=1';
 
     async function fetchToteData() {
       try {
