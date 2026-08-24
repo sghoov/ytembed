@@ -1,485 +1,431 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Papa Gigs Tote Board</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Montserrat:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-card: rgba(18, 18, 22, 0.92);
-            --gold-accent: #ffb703;
-            --orange-neon: #fb8500;
-            --green-neon: #38b000;
-            --cyan-glow: #00f5d4;
-            --dark-card: #0d0e12;
-            --card-border: rgba(255, 183, 3, 0.4);
-            --text-light: #f8f9fa;
-            --text-muted: #90e0ef;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Papa Gigs Tote Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: rgba(15, 23, 42, 0.90);
+      --accent-color: #00ff88;
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --danger-color: #ff4444;
+      --door-dash: #ff3008;
+      --uber-eats: #06c167;
+      --amazon-flex: #ff9900;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        body {
-            background-color: transparent;
-            font-family: 'Montserrat', sans-serif;
-            color: var(--text-light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
+    body {
+      background-color: transparent;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
 
-        /* Container Card */
-        .tote-board {
-            width: 480px;
-            background: linear-gradient(145deg, rgba(20, 21, 26, 0.95), rgba(10, 10, 14, 0.98));
-            border: 2px solid var(--card-border);
-            border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85),
-                        0 0 15px rgba(255, 183, 3, 0.15);
-            backdrop-filter: blur(10px);
-            position: relative;
-        }
+    /* Container with Rotating Conic Glow */
+    .tote-container {
+      position: relative;
+      width: 480px;
+      background: var(--bg-color);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 0 25px rgba(0, 255, 136, 0.3);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+    }
 
-        .tote-board::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--orange-neon), var(--gold-accent), var(--cyan-glow));
-            border-radius: 18px 18px 0 0;
-        }
+    /* Moving Border Gradient Layer */
+    .tote-container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        transparent, 
+        rgba(0, 255, 136, 0.1), 
+        var(--accent-color), 
+        rgba(0, 255, 136, 0.1), 
+        transparent 60%
+      );
+      animation: rotate-border 4s linear infinite;
+      z-index: 0;
+    }
 
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-        }
+    /* Inner Background Mask */
+    .tote-container::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: var(--bg-color);
+      border-radius: 10px;
+      z-index: 1;
+    }
 
-        .brand {
-            display: flex;
-            flex-direction: column;
-        }
+    @keyframes rotate-border {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        .channel-name {
-            font-family: 'Teko', sans-serif;
-            font-size: 38px;
-            line-height: 0.9;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            background: linear-gradient(90deg, #ffffff, var(--gold-accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-        }
+    /* Bring Content Above Mask */
+    .tote-header,
+    .hero-section,
+    .stats-grid,
+    .apps-breakdown,
+    .tote-footer {
+      position: relative;
+      z-index: 2;
+    }
 
-        .motto {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: var(--orange-neon);
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
+    /* Header & Logo */
+    .tote-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
 
-        .status-badge {
-            background: rgba(56, 176, 0, 0.15);
-            border: 1px solid var(--green-neon);
-            color: var(--green-neon);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--green-neon);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--green-neon);
-            animation: pulse 1.5s infinite;
-        }
+    .brand-logo {
+      height: 42px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 6px;
+    }
 
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-            100% { opacity: 1; transform: scale(1); }
-        }
+    .brand-titles {
+      display: flex;
+      flex-direction: column;
+    }
 
-        /* Main Content Layout */
-        .main-layout {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
+    .channel-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
 
-        /* Avatar TV Frame */
-        .tv-frame-container {
-            width: 120px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    .motto-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
 
-        .tv-frame {
-            width: 120px;
-            height: 120px;
-            border-radius: 14px;
-            background: #000;
-            border: 2px solid var(--cyan-glow);
-            box-shadow: 0 0 12px rgba(0, 245, 212, 0.3);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-color);
+      letter-spacing: 1px;
+      background: rgba(0, 255, 136, 0.08);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
 
-        .tv-avatar {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      box-shadow: 0 0 10px var(--accent-color);
+      animation: pulse-green 1.5s infinite;
+    }
 
-        /* Graphic fallback avatar using SVG */
-        .avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, #2a2d3a 0%, #111217 100%);
-        }
+    @keyframes pulse-green {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
+      70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(0, 255, 136, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+    }
 
-        .scanlines {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(
-                rgba(18, 16, 16, 0) 50%, 
-                rgba(0, 0, 0, 0.35) 50%
-            );
-            background-size: 100% 4px;
-            pointer-events: none;
-        }
+    /* Hero Total Panel */
+    .hero-section {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--accent-color);
+      padding: 12px 16px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
 
-        /* Primary Earnings Display */
-        .hero-panel {
-            flex-grow: 1;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 12px 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+    .hero-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
 
-        .label-sm {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: #8a99ad;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
+    .hero-value {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--accent-color);
+      line-height: 1;
+      text-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+    }
 
-        .hero-val {
-            font-family: 'Teko', sans-serif;
-            font-size: 52px;
-            line-height: 0.95;
-            font-weight: 700;
-            color: var(--green-neon);
-            text-shadow: 0 0 12px rgba(56, 176, 0, 0.3);
-        }
+    .sub-breakdown {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-color);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
 
-        .sub-breakout {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 6px;
-            padding-top: 6px;
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
-            font-size: 11px;
-            color: #d1d5db;
-        }
+    .sub-breakdown span strong {
+      color: var(--text-main);
+    }
 
-        /* Metrics Row */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
+    /* Stats Grid */
+    .stats-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
 
-        .metric-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            padding: 8px 10px;
-            text-align: center;
-        }
+    .stat-box {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
 
-        .metric-val {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--gold-accent);
-            margin-top: 2px;
-        }
+    .stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
 
-        /* Apps Breakdown Bar */
-        .apps-container {
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 10px;
-            padding: 10px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
 
-        .apps-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }
+    /* Platform Breakdown */
+    .apps-breakdown {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
 
-        .app-badges {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-        }
+    .apps-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
 
-        .app-pill {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 6px;
-            padding: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-left: 3px solid #666;
-        }
+    .apps-grid {
+      display: flex;
+      gap: 8px;
+    }
 
-        .app-pill.dd { border-left-color: #ff3008; }
-        .app-pill.ue { border-left-color: #06c167; }
-        .app-pill.af { border-left-color: #ff9900; }
+    .app-card {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 6px;
+      border-radius: 6px;
+      text-align: center;
+      border-left: 3px solid var(--border-color);
+    }
 
-        .app-name {
-            font-size: 9px;
-            font-weight: 700;
-            color: #9ca3af;
-            text-transform: uppercase;
-        }
+    .app-card.dd { border-left-color: var(--door-dash); }
+    .app-card.ue { border-left-color: var(--uber-eats); }
+    .app-card.af { border-left-color: var(--amazon-flex); }
 
-        .app-val {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 2px;
-        }
+    .app-name {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: block;
+    }
 
-        /* Footer Info */
-        .footer-bar {
-            margin-top: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 9px;
-            color: #6b7280;
-            font-family: 'Share Tech Mono', monospace;
-        }
-    </style>
+    .app-val {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* Footer */
+    .tote-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="tote-board">
-        <!-- Header Section -->
-        <header class="header">
-            <div class="brand">
-                <span class="channel-name" id="streamer-name">PAPA GIGS</span>
-                <span class="motto" id="channel-motto">WE'RE ROLLIN'</span>
-            </div>
-            <div class="status-badge">
-                <div class="live-dot"></div>
-                <span>TOTE BOARD</span>
-            </div>
-        </header>
-
-        <!-- Main Layout -->
-        <div class="main-layout">
-            <!-- TV Frame Avatar -->
-            <div class="tv-frame-container">
-                <div class="tv-frame">
-                    <!-- Default SVG Avatar with Cap & Goatee -->
-                    <svg class="avatar-placeholder" id="avatar-svg" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="48" fill="#1e2029" stroke="#ffb703" stroke-width="2"/>
-                        <!-- Cap Facing Forward -->
-                        <path d="M25 42 Q50 20 75 42 L82 45 L18 45 Z" fill="#ff9900"/>
-                        <rect x="15" y="44" width="70" height="5" rx="2" fill="#e68a00"/>
-                        <!-- Head -->
-                        <circle cx="50" cy="52" r="20" fill="#f1c27d"/>
-                        <!-- Goatee -->
-                        <path d="M42 62 Q50 78 58 62 Q50 68 42 62 Z" fill="#332211"/>
-                        <!-- Sunglasses -->
-                        <rect x="33" y="48" width="15" height="8" rx="2" fill="#111"/>
-                        <rect x="52" y="48" width="15" height="8" rx="2" fill="#111"/>
-                        <line x1="48" y1="51" x2="52" y2="51" stroke="#111" stroke-width="2"/>
-                    </svg>
-                    <!-- If avatar.png is present in the same folder, it loads automatically -->
-                    <img id="avatar-img" class="tv-avatar" src="avatar.png" alt="Papa Gigs" style="display:none;" onerror="this.style.display='none'; document.getElementById('avatar-svg').style.display='block';">
-                    <div class="scanlines"></div>
-                </div>
-            </div>
-
-            <!-- Primary Earnings -->
-            <div class="hero-panel">
-                <span class="label-sm">Shift Earnings Total</span>
-                <span class="hero-val" id="gross-earnings">$0.00</span>
-                <div class="sub-breakout">
-                    <span>Base: <strong id="base-pay" style="color:#fff;">$0.00</strong></span>
-                    <span>Tips: <strong id="tips-pay" style="color:#38b000;">$0.00</strong></span>
-                    <span>Deliveries: <strong id="delivery-count" style="color:#fff;">0</strong></span>
-                </div>
-            </div>
+  <div class="tote-container">
+    <!-- Header with logo.jpg -->
+    <div class="tote-header">
+      <div class="brand-left">
+        <img src="logo.jpg" alt="Papa Gigs Logo" class="brand-logo" onerror="this.style.display='none'">
+        <div class="brand-titles">
+          <span class="channel-title" id="streamer-name">PAPA GIGS</span>
+          <span class="motto-text" id="channel-motto">WE'RE ROLLIN'</span>
         </div>
-
-        <!-- Metrics Grid -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="label-sm">$/Hour</div>
-                <div class="metric-val" id="per-hour">$0.00</div>
-            </div>
-            <div class="metric-card">
-                <div class="label-sm">$/Mile</div>
-                <div class="metric-val" id="per-mile">$0.00</div>
-            </div>
-            <div class="metric-card">
-                <div class="label-sm">Total Miles</div>
-                <div class="metric-val" id="total-miles">0.0</div>
-            </div>
-        </div>
-
-        <!-- App Breakdown -->
-        <div class="apps-container">
-            <div class="apps-header">
-                <span class="label-sm">Platform Breakdown</span>
-                <span class="label-sm" id="active-hours">0.0 HRS</span>
-            </div>
-            <div class="app-badges">
-                <div class="app-pill dd">
-                    <span class="app-name">DoorDash</span>
-                    <span class="app-val" id="app-dd">$0.00</span>
-                </div>
-                <div class="app-pill ue">
-                    <span class="app-name">Uber Eats</span>
-                    <span class="app-val" id="app-ue">$0.00</span>
-                </div>
-                <div class="app-pill af">
-                    <span class="app-name">Amazon Flex</span>
-                    <span class="app-val" id="app-af">$0.00</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer-bar">
-            <span>UPDATED: <span id="last-updated">--:--</span></span>
-            <span>PAPA GIGS TELEMETRY</span>
-        </div>
+      </div>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span>TOTE BOARD</span>
+      </div>
     </div>
 
-    <script>
-        // Replace this URL with your actual Dropbox raw direct download URL
-        // Remember to change 'dl=0' to 'dl=1' at the end of your Dropbox share link
-        const DROPBOX_JSON_URL = 'https://www.dropbox.com/scl/fi/YOUR_DROPBOX_FILE_ID/tote.json?rlkey=YOUR_KEY&dl=1';
+    <!-- Main Shift Earnings -->
+    <div class="hero-section">
+      <div class="hero-label">Shift Earnings Total</div>
+      <div class="hero-value" id="gross-earnings">$0.00</div>
+      <div class="sub-breakdown">
+        <span>Base: <strong id="base-pay">$0.00</strong></span>
+        <span>Tips: <strong id="tips-pay" style="color: var(--accent-color);">$0.00</strong></span>
+        <span>Deliveries: <strong id="delivery-count">0</strong></span>
+      </div>
+    </div>
 
-        async function fetchToteData() {
-            try {
-                // Append timestamp to prevent browser caching
-                const cacheBusterUrl = DROPBOX_JSON_URL + '&t=' + new Date().getTime();
-                const response = await fetch(cacheBusterUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                updateUI(data);
-            } catch (error) {
-                console.error("Error fetching tote.json from Dropbox:", error);
-            }
-        }
+    <!-- Metrics Grid -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">$/HOUR</div>
+        <div class="stat-value" id="per-hour">$0.00</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">$/MILE</div>
+        <div class="stat-value" id="per-mile">$0.00</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">MILES</div>
+        <div class="stat-value" id="total-miles">0.0</div>
+      </div>
+    </div>
 
-        function updateUI(data) {
-            if (!data) return;
+    <!-- Platform Breakdown -->
+    <div class="apps-breakdown">
+      <div class="apps-header">
+        <span>Platform Split</span>
+        <span id="active-hours">0.0 HRS</span>
+      </div>
+      <div class="apps-grid">
+        <div class="app-card dd">
+          <span class="app-name">DoorDash</span>
+          <span class="app-val" id="app-dd">$0.00</span>
+        </div>
+        <div class="app-card ue">
+          <span class="app-name">Uber Eats</span>
+          <span class="app-val" id="app-ue">$0.00</span>
+        </div>
+        <div class="app-card af">
+          <span class="app-name">Amazon Flex</span>
+          <span class="app-val" id="app-af">$0.00</span>
+        </div>
+      </div>
+    </div>
 
-            // Branding
-            if (data.streamer) document.getElementById('streamer-name').textContent = data.streamer;
-            if (data.motto) document.getElementById('channel-motto').textContent = data.motto;
+    <!-- Footer -->
+    <div class="tote-footer">
+      <span>UPDATED: <span id="last-updated">--:--</span></span>
+      <span>PAPA GIGS TELEMETRY</span>
+    </div>
+  </div>
 
-            // Totals
-            const shift = data.shiftTotals || {};
-            document.getElementById('gross-earnings').textContent = formatCurrency(shift.grossEarnings);
-            document.getElementById('base-pay').textContent = formatCurrency(shift.basePay);
-            document.getElementById('tips-pay').textContent = formatCurrency(shift.tips);
-            document.getElementById('delivery-count').textContent = shift.deliveriesCompleted || 0;
+  <script>
+    // Set your Dropbox Direct Link here (ending with dl=1)
+    const DROPBOX_JSON_URL = 'https://www.dropbox.com/scl/fi/YOUR_FILE_ID/tote.json?rlkey=YOUR_KEY&dl=1';
 
-            // Efficiency & Metrics
-            const eff = shift.efficiency || {};
-            document.getElementById('per-hour').textContent = formatCurrency(eff.perHour);
-            document.getElementById('per-mile').textContent = formatCurrency(eff.perMile);
-            document.getElementById('total-miles').textContent = (shift.totalMiles || 0).toFixed(1);
-            document.getElementById('active-hours').textContent = `${(shift.activeHours || 0).toFixed(1)} HRS`;
+    async function fetchToteData() {
+      try {
+        const response = await fetch(DROPBOX_JSON_URL + '&t=' + new Date().getTime());
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        updateUI(data);
+      } catch (error) {
+        console.error("Error fetching tote.json:", error);
+      }
+    }
 
-            // Apps Breakdown
-            const apps = data.appsBreakdown || {};
-            document.getElementById('app-dd').textContent = formatCurrency(apps.doorDash);
-            document.getElementById('app-ue').textContent = formatCurrency(apps.uberEats);
-            document.getElementById('app-af').textContent = formatCurrency(apps.amazonFlex);
+    function updateUI(data) {
+      if (!data) return;
 
-            // Last Updated Timestamp
-            if (data.lastUpdated) {
-                const dateObj = new Date(data.lastUpdated);
-                document.getElementById('last-updated').textContent = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            } else {
-                document.getElementById('last-updated').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-        }
+      if (data.streamer) document.getElementById('streamer-name').textContent = data.streamer;
+      if (data.motto) document.getElementById('channel-motto').textContent = data.motto;
 
-        function formatCurrency(val) {
-            const num = parseFloat(val) || 0;
-            return '$' + num.toFixed(2);
-        }
+      const shift = data.shiftTotals || {};
+      document.getElementById('gross-earnings').textContent = formatCurrency(shift.grossEarnings);
+      document.getElementById('base-pay').textContent = formatCurrency(shift.basePay);
+      document.getElementById('tips-pay').textContent = formatCurrency(shift.tips);
+      document.getElementById('delivery-count').textContent = shift.deliveriesCompleted || 0;
 
-        // Handle image avatar fallback logic
-        const img = document.getElementById('avatar-img');
-        img.onload = function() {
-            document.getElementById('avatar-svg').style.display = 'none';
-            img.style.display = 'block';
-        };
+      const eff = shift.efficiency || {};
+      document.getElementById('per-hour').textContent = formatCurrency(eff.perHour);
+      document.getElementById('per-mile').textContent = formatCurrency(eff.perMile);
+      document.getElementById('total-miles').textContent = (shift.totalMiles || 0).toFixed(1);
+      document.getElementById('active-hours').textContent = `${(shift.activeHours || 0).toFixed(1)} HRS`;
 
-        // Initial fetch and 10-second polling interval
-        fetchToteData();
-        setInterval(fetchToteData, 10000);
-    </script>
+      const apps = data.appsBreakdown || {};
+      document.getElementById('app-dd').textContent = formatCurrency(apps.doorDash);
+      document.getElementById('app-ue').textContent = formatCurrency(apps.uberEats);
+      document.getElementById('app-af').textContent = formatCurrency(apps.amazonFlex);
+
+      if (data.lastUpdated) {
+        const dateObj = new Date(data.lastUpdated);
+        document.getElementById('last-updated').textContent = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+
+    function formatCurrency(val) {
+      const num = parseFloat(val) || 0;
+      return '$' + num.toFixed(2);
+    }
+
+    fetchToteData();
+    setInterval(fetchToteData, 10000);
+  </script>
 </body>
 </html>
