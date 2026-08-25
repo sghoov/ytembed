@@ -224,7 +224,6 @@
       overflow: hidden;
     }
 
-    /* Background Fill Bar */
     .bar-fill {
       position: absolute;
       top: 0;
@@ -296,7 +295,7 @@
       </div>
     </div>
 
-    <!-- Apps Breakdown with Dynamic Bar Graph -->
+    <!-- Apps Breakdown -->
     <div class="apps-list">
       <!-- DoorDash -->
       <div class="app-row dd">
@@ -322,16 +321,18 @@
   </div>
 
   <script>
-    const DROPBOX_JSON_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&st=dmju96kf&raw=1';
+    // Direct Dropbox JSON raw URL wrapped in CORS proxy to allow cross-domain browser fetching
+    const RAW_DROPBOX_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&st=i2b1or5c&raw=1';
+    const FETCH_URL = 'https://corsproxy.io/?' + encodeURIComponent(RAW_DROPBOX_URL);
 
     async function fetchToteData() {
       try {
-        const response = await fetch(DROPBOX_JSON_URL + '&t=' + new Date().getTime());
+        const response = await fetch(FETCH_URL + '&t=' + new Date().getTime());
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
         updateUI(data);
       } catch (error) {
-        console.error("Error fetching tote.json:", error);
+        console.error("Error fetching tote.json via proxy:", error);
       }
     }
 
@@ -350,7 +351,6 @@
       document.getElementById('per-mile').textContent = formatCurrency(eff.perMile);
       document.getElementById('total-miles').textContent = (shift.totalMiles || 0).toFixed(1);
 
-      // Apps Data & Bar Graph Calculations
       const apps = data.appsBreakdown || {};
       const ddAmt = parseFloat(apps.doorDash) || 0;
       const ueAmt = parseFloat(apps.uberEats) || 0;
@@ -360,7 +360,6 @@
       document.getElementById('app-ue').textContent = formatCurrency(ueAmt);
       document.getElementById('app-af').textContent = formatCurrency(afAmt);
 
-      // Relative bar width calculation based on highest earning app or total
       const maxAmt = Math.max(ddAmt, ueAmt, afAmt, 1);
       document.getElementById('bar-dd').style.width = `${(ddAmt / maxAmt) * 100}%`;
       document.getElementById('bar-ue').style.width = `${(ueAmt / maxAmt) * 100}%`;
