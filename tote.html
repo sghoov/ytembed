@@ -3,28 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Papa Gigs Tote Board</title>
+  <title>Papa Gigs Earnings Summary</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: rgba(15, 23, 42, 0.90);
-      --accent-color: #00ff88;
+      --bg-card: rgba(18, 18, 20, 0.95);
+      --border-light: rgba(255, 255, 255, 0.08);
       --text-main: #ffffff;
-      --text-muted: #94a3b8;
-      --border-color: rgba(255, 255, 255, 0.1);
-      --danger-color: #ff4444;
-      --door-dash: #ff3008;
-      --uber-eats: #06c167;
-      --amazon-flex: #ff9900;
+      --text-muted: #9ca3af;
+      --accent-green: #10b981;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: transparent;
@@ -37,286 +29,189 @@
       overflow: hidden;
     }
 
-    .tote-container {
-      position: relative;
-      width: 480px;
-      background: var(--bg-color);
-      border: 2px solid transparent;
-      border-radius: 12px;
-      padding: 16px 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 136, 0.3);
-      backdrop-filter: blur(8px);
-      overflow: hidden;
+    .summary-card {
+      width: 420px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
     }
 
-    .tote-container::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: conic-gradient(
-        transparent, 
-        rgba(0, 255, 136, 0.1), 
-        var(--accent-color), 
-        rgba(0, 255, 136, 0.1), 
-        transparent 60%
-      );
-      animation: rotate-border 4s linear infinite;
-      z-index: 0;
-    }
-
-    .tote-container::after {
-      content: '';
-      position: absolute;
-      inset: 2px;
-      background: var(--bg-color);
-      border-radius: 10px;
-      z-index: 1;
-    }
-
-    @keyframes rotate-border {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .tote-header,
-    .hero-section,
-    .stats-grid,
-    .apps-breakdown,
-    .tote-footer {
-      position: relative;
-      z-index: 2;
-    }
-
-    .tote-header {
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 10px;
+      margin-bottom: 24px;
     }
 
-    .brand-left {
+    .brand {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
     .brand-logo {
-      height: 42px;
-      width: auto;
-      object-fit: contain;
-      border-radius: 6px;
+      height: 40px;
+      width: 40px;
+      border-radius: 8px;
+      object-fit: cover;
     }
 
-    .brand-titles {
+    .title-area {
       display: flex;
       flex-direction: column;
     }
 
-    .channel-title {
-      font-size: 18px;
+    .title-main {
+      font-size: 16px;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--text-main);
-      line-height: 1.1;
+      letter-spacing: -0.5px;
     }
 
     .motto-text {
-      font-size: 11px;
-      font-weight: 500;
+      font-size: 12px;
       color: var(--text-muted);
-      letter-spacing: 0.5px;
+      font-weight: 500;
     }
 
-    .status-badge {
+    .live-indicator {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent-color);
-      letter-spacing: 1px;
-      background: rgba(0, 255, 136, 0.08);
-      padding: 6px 12px;
-      border-radius: 20px;
-      border: 1px solid rgba(0, 255, 136, 0.2);
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 4px 10px;
+      border-radius: 12px;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-green);
       border-radius: 50%;
-      background: var(--accent-color);
-      box-shadow: 0 0 10px var(--accent-color);
-      animation: pulse-green 1.5s infinite;
+      animation: pulse 2s infinite;
     }
 
-    @keyframes pulse-green {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
-      70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(0, 255, 136, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
     }
 
     .hero-section {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--accent-color);
-      padding: 12px 16px;
-      border-radius: 8px;
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-light);
     }
 
     .hero-label {
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text-muted);
-      letter-spacing: 1px;
       text-transform: uppercase;
-      margin-bottom: 2px;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
     }
 
     .hero-value {
-      font-size: 40px;
-      font-weight: 900;
-      color: var(--accent-color);
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -2px;
       line-height: 1;
-      text-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
-    }
-
-    .sub-breakdown {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid var(--border-color);
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .sub-breakdown span strong {
-      color: var(--text-main);
     }
 
     .stats-grid {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
     }
 
     .stat-box {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 10px;
-      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 12px;
       text-align: center;
-      border: 1px solid var(--border-color);
     }
 
     .stat-label {
-      font-size: 10px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--text-muted);
-      letter-spacing: 0.5px;
       margin-bottom: 4px;
     }
 
     .stat-value {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
-      color: var(--text-main);
     }
 
-    .apps-breakdown {
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 12px;
+    .apps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    .apps-header {
+    .app-row {
       display: flex;
       justify-content: space-between;
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      text-transform: uppercase;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 12px 16px;
     }
 
-    .apps-grid {
+    .app-info {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      gap: 12px;
     }
 
-    .app-card {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 6px;
-      border-radius: 6px;
-      text-align: center;
-      border-left: 3px solid var(--border-color);
+    .app-logo {
+      height: 24px;
+      width: 24px;
+      object-fit: contain;
     }
-
-    .app-card.dd { border-left-color: var(--door-dash); }
-    .app-card.ue { border-left-color: var(--uber-eats); }
-    .app-card.af { border-left-color: var(--amazon-flex); }
 
     .app-name {
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      display: block;
-    }
-
-    .app-val {
       font-size: 14px;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-top: 2px;
-      display: block;
+      font-weight: 600;
+      color: #e5e7eb;
     }
 
-    .tote-footer {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--text-muted);
-      font-weight: 500;
+    .app-amount {
+      font-size: 16px;
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
 
-  <div class="tote-container">
-    <div class="tote-header">
-      <div class="brand-left">
-        <img src="logo.jpg" alt="Papa Gigs Logo" class="brand-logo" onerror="this.style.display='none'">
-        <div class="brand-titles">
-          <span class="channel-title" id="streamer-name">PAPA GIGS</span>
+  <div class="summary-card">
+    <div class="header">
+      <div class="brand">
+        <img src="logo.jpg" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+        <div class="title-area">
+          <span class="title-main" id="streamer-name">PAPA GIGS</span>
           <span class="motto-text" id="channel-motto">WE'RE ROLLIN'</span>
         </div>
       </div>
-      <div class="status-badge">
-        <span class="status-dot"></span>
-        <span>TOTE BOARD</span>
+      <div class="live-indicator">
+        <div class="pulse-dot"></div>
+        <span id="last-updated">LIVE</span>
       </div>
     </div>
 
     <div class="hero-section">
-      <div class="hero-label">Shift Earnings Total</div>
+      <div class="hero-label">Shift Earnings</div>
       <div class="hero-value" id="gross-earnings">$0.00</div>
-      <div class="sub-breakdown">
-        <span>Base: <strong id="base-pay">$0.00</strong></span>
-        <span>Tips: <strong id="tips-pay" style="color: var(--accent-color);">$0.00</strong></span>
-        <span>Deliveries: <strong id="delivery-count">0</strong></span>
-      </div>
     </div>
 
     <div class="stats-grid">
@@ -334,35 +229,37 @@
       </div>
     </div>
 
-    <div class="apps-breakdown">
-      <div class="apps-header">
-        <span>Platform Split</span>
-        <span id="active-hours">0.0 HRS</span>
-      </div>
-      <div class="apps-grid">
-        <div class="app-card dd">
+    <div class="apps-list">
+      <!-- DoorDash (From Dropbox) -->
+      <div class="app-row">
+        <div class="app-info">
+          <img src="https://www.dropbox.com/scl/fi/qqoansmx8y0iq6t9jmsho/dd-logo.png?rlkey=tv5yfn4i8844uhwrhy7mcntrx&st=vg5bd32h&raw=1" alt="DoorDash" class="app-logo">
           <span class="app-name">DoorDash</span>
-          <span class="app-val" id="app-dd">$0.00</span>
         </div>
-        <div class="app-card ue">
-          <span class="app-name">Uber Eats</span>
-          <span class="app-val" id="app-ue">$0.00</span>
-        </div>
-        <div class="app-card af">
-          <span class="app-name">Amazon Flex</span>
-          <span class="app-val" id="app-af">$0.00</span>
-        </div>
+        <div class="app-amount" id="app-dd">$0.00</div>
       </div>
-    </div>
 
-    <div class="tote-footer">
-      <span>UPDATED: <span id="last-updated">--:--</span></span>
-      <span>PAPA GIGS TELEMETRY</span>
+      <!-- Uber Eats (From Dropbox) -->
+      <div class="app-row">
+        <div class="app-info">
+          <img src="https://www.dropbox.com/scl/fi/pz9u95lu4yblbcvhurt8g/uber-eats-logo.png?rlkey=euda6oskb5ddsuc2tt4jwls2p&st=gdpfdvmr&raw=1" alt="Uber Eats" class="app-logo">
+          <span class="app-name">Uber Eats</span>
+        </div>
+        <div class="app-amount" id="app-ue">$0.00</div>
+      </div>
+
+      <!-- Amazon Flex (From Dropbox) -->
+      <div class="app-row">
+        <div class="app-info">
+          <img src="https://www.dropbox.com/scl/fi/78v8w88f7dn57opphgcx1/flex-logo1.png?rlkey=i5fky0mtxxj860l4bnj4g4g4u&st=0u54ixn7&raw=1" alt="Amazon Flex" class="app-logo">
+          <span class="app-name">Amazon Flex</span>
+        </div>
+        <div class="app-amount" id="app-af">$0.00</div>
+      </div>
     </div>
   </div>
 
   <script>
-    // Direct link to your Dropbox tote.json
     const DROPBOX_JSON_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&st=dmju96kf&raw=1';
 
     async function fetchToteData() {
@@ -384,21 +281,17 @@
 
       const shift = data.shiftTotals || {};
       document.getElementById('gross-earnings').textContent = formatCurrency(shift.grossEarnings);
-      document.getElementById('base-pay').textContent = formatCurrency(shift.basePay);
-      document.getElementById('tips-pay').textContent = formatCurrency(shift.tips);
-      document.getElementById('delivery-count').textContent = shift.deliveriesCompleted || 0;
 
       const eff = shift.efficiency || {};
       document.getElementById('per-hour').textContent = formatCurrency(eff.perHour);
       document.getElementById('per-mile').textContent = formatCurrency(eff.perMile);
       document.getElementById('total-miles').textContent = (shift.totalMiles || 0).toFixed(1);
-      document.getElementById('active-hours').textContent = `${(shift.activeHours || 0).toFixed(1)} HRS`;
 
       const apps = data.appsBreakdown || {};
       document.getElementById('app-dd').textContent = formatCurrency(apps.doorDash);
       document.getElementById('app-ue').textContent = formatCurrency(apps.uberEats);
       document.getElementById('app-af').textContent = formatCurrency(apps.amazonFlex);
-
+      
       if (data.lastUpdated) {
         const dateObj = new Date(data.lastUpdated);
         document.getElementById('last-updated').textContent = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
