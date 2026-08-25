@@ -149,7 +149,7 @@
       100% { opacity: 1; }
     }
 
-    /* Slightly Reduced Hero Earnings Section */
+    /* Hero Earnings Section */
     .hero-section {
       text-align: center;
       margin-bottom: 18px;
@@ -202,7 +202,7 @@
       font-weight: 700;
     }
 
-    /* Enlarged App Breakdown Rows */
+    /* App Rows with Logos Only */
     .apps-list {
       display: flex;
       flex-direction: column;
@@ -216,29 +216,17 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border-light);
       border-radius: 12px;
-      padding: 14px 18px;
-    }
-
-    .app-info {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      padding: 12px 20px;
     }
 
     .app-logo {
-      height: 32px;
-      width: 32px;
+      height: 42px;
+      max-width: 140px;
       object-fit: contain;
     }
 
-    .app-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: #f3f4f6;
-    }
-
     .app-amount {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 800;
     }
   </style>
@@ -261,7 +249,7 @@
       </div>
     </div>
 
-    <!-- Reduced Total Earnings -->
+    <!-- Total Earnings -->
     <div class="hero-section">
       <div class="hero-label">Shift Earnings</div>
       <div class="hero-value" id="gross-earnings">$0.00</div>
@@ -283,32 +271,23 @@
       </div>
     </div>
 
-    <!-- Enlarged Apps Breakdown -->
+    <!-- Apps Breakdown (Logos Only) -->
     <div class="apps-list">
       <!-- DoorDash -->
       <div class="app-row">
-        <div class="app-info">
-          <img src="https://www.dropbox.com/scl/fi/qqoansmx8y0iq6t9jmsho/dd-logo.png?rlkey=tv5yfn4i8844uhwrhy7mcntrx&st=vg5bd32h&raw=1" alt="DoorDash" class="app-logo">
-          <span class="app-name">DoorDash</span>
-        </div>
+        <img src="https://www.dropbox.com/scl/fi/qqoansmx8y0iq6t9jmsho/dd-logo.png?rlkey=tv5yfn4i8844uhwrhy7mcntrx&st=vg5bd32h&raw=1" alt="DoorDash" class="app-logo">
         <div class="app-amount" id="app-dd">$0.00</div>
       </div>
 
       <!-- Uber Eats -->
       <div class="app-row">
-        <div class="app-info">
-          <img src="https://www.dropbox.com/scl/fi/pz9u95lu4yblbcvhurt8g/uber-eats-logo.png?rlkey=euda6oskb5ddsuc2tt4jwls2p&st=gdpfdvmr&raw=1" alt="Uber Eats" class="app-logo">
-          <span class="app-name">Uber Eats</span>
-        </div>
+        <img src="https://www.dropbox.com/scl/fi/pz9u95lu4yblbcvhurt8g/uber-eats-logo.png?rlkey=euda6oskb5ddsuc2tt4jwls2p&st=gdpfdvmr&raw=1" alt="Uber Eats" class="app-logo">
         <div class="app-amount" id="app-ue">$0.00</div>
       </div>
 
       <!-- Amazon Flex -->
       <div class="app-row">
-        <div class="app-info">
-          <img src="https://www.dropbox.com/scl/fi/78v8w88f7dn57opphgcx1/flex-logo1.png?rlkey=i5fky0mtxxj860l4bnj4g4g4u&st=0u54ixn7&raw=1" alt="Amazon Flex" class="app-logo">
-          <span class="app-name">Amazon Flex</span>
-        </div>
+        <img src="https://www.dropbox.com/scl/fi/78v8w88f7dn57opphgcx1/flex-logo1.png?rlkey=i5fky0mtxxj860l4bnj4g4g4u&st=0u54ixn7&raw=1" alt="Amazon Flex" class="app-logo">
         <div class="app-amount" id="app-af">$0.00</div>
       </div>
     </div>
