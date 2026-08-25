@@ -320,20 +320,37 @@
     </div>
   </div>
 
-  <script>
-    // Direct Dropbox JSON raw URL wrapped in CORS proxy to allow cross-domain browser fetching
-    const RAW_DROPBOX_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&st=i2b1or5c&raw=1';
-    const FETCH_URL = 'https://corsproxy.io/?' + encodeURIComponent(RAW_DROPBOX_URL);
+<script>
+    const RAW_DROPBOX_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&raw=1';
 
     async function fetchToteData() {
+      // Add timestamp directly to Dropbox URL to bypass caching
+      const timestampedUrl = RAW_DROPBOX_URL + '&t=' + Date.now();
+      
+      // Primary proxy: corsproxy.io
+      const primaryProxy = 'https://corsproxy.io/?' + encodeURIComponent(timestampedUrl);
+      // Backup proxy: api.allorigins.win
+      const backupProxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(timestampedUrl);
+
+      let data = null;
+
       try {
-        const response = await fetch(FETCH_URL + '&t=' + new Date().getTime());
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json();
-        updateUI(data);
-      } catch (error) {
-        console.error("Error fetching tote.json via proxy:", error);
+        const response = await fetch(primaryProxy);
+        if (!response.ok) throw new Error(`Primary proxy HTTP ${response.status}`);
+        data = await response.json();
+      } catch (err) {
+        console.warn("Primary proxy failed, trying backup proxy...", err);
+        try {
+          const backupResponse = await fetch(backupProxy);
+          if (!backupResponse.ok) throw new Error(`Backup proxy HTTP ${backupResponse.status}`);
+          data = await backupResponse.json();
+        } catch (backupErr) {
+          console.error("Both CORS proxies failed to load tote.json:", backupErr);
+          return;
+        }
       }
+
+      updateUI(data);
     }
 
     function updateUI(data) {
