@@ -14,6 +14,9 @@
       --text-main: #ffffff;
       --text-muted: #94a3b8;
       --accent-color: #00ff88;
+      --dd-color: #ff3008;
+      --ue-color: #06c167;
+      --af-color: #ff9900;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -82,7 +85,7 @@
       z-index: 2;
     }
 
-    /* Header & Enlarged Logo */
+    /* Header */
     .header {
       display: flex;
       justify-content: space-between;
@@ -202,7 +205,7 @@
       font-weight: 700;
     }
 
-    /* App Rows with Logos Only */
+    /* App Rows with Dynamic Visual Bars */
     .apps-list {
       display: flex;
       flex-direction: column;
@@ -210,6 +213,7 @@
     }
 
     .app-row {
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -217,15 +221,36 @@
       border: 1px solid var(--border-light);
       border-radius: 12px;
       padding: 12px 20px;
+      overflow: hidden;
     }
 
+    /* Background Fill Bar */
+    .bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      opacity: 0.18;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+    }
+
+    .app-row.dd .bar-fill { background-color: var(--dd-color); }
+    .app-row.ue .bar-fill { background-color: var(--ue-color); }
+    .app-row.af .bar-fill { background-color: var(--af-color); }
+
     .app-logo {
+      position: relative;
+      z-index: 2;
       height: 42px;
       max-width: 140px;
       object-fit: contain;
     }
 
     .app-amount {
+      position: relative;
+      z-index: 2;
       font-size: 20px;
       font-weight: 800;
     }
@@ -271,22 +296,25 @@
       </div>
     </div>
 
-    <!-- Apps Breakdown (Logos Only) -->
+    <!-- Apps Breakdown with Dynamic Bar Graph -->
     <div class="apps-list">
       <!-- DoorDash -->
-      <div class="app-row">
+      <div class="app-row dd">
+        <div class="bar-fill" id="bar-dd"></div>
         <img src="https://www.dropbox.com/scl/fi/qqoansmx8y0iq6t9jmsho/dd-logo.png?rlkey=tv5yfn4i8844uhwrhy7mcntrx&st=vg5bd32h&raw=1" alt="DoorDash" class="app-logo">
         <div class="app-amount" id="app-dd">$0.00</div>
       </div>
 
       <!-- Uber Eats -->
-      <div class="app-row">
+      <div class="app-row ue">
+        <div class="bar-fill" id="bar-ue"></div>
         <img src="https://www.dropbox.com/scl/fi/pz9u95lu4yblbcvhurt8g/uber-eats-logo.png?rlkey=euda6oskb5ddsuc2tt4jwls2p&st=gdpfdvmr&raw=1" alt="Uber Eats" class="app-logo">
         <div class="app-amount" id="app-ue">$0.00</div>
       </div>
 
       <!-- Amazon Flex -->
-      <div class="app-row">
+      <div class="app-row af">
+        <div class="bar-fill" id="bar-af"></div>
         <img src="https://www.dropbox.com/scl/fi/78v8w88f7dn57opphgcx1/flex-logo1.png?rlkey=i5fky0mtxxj860l4bnj4g4g4u&st=0u54ixn7&raw=1" alt="Amazon Flex" class="app-logo">
         <div class="app-amount" id="app-af">$0.00</div>
       </div>
@@ -314,17 +342,29 @@
       if (data.motto) document.getElementById('channel-motto').textContent = data.motto;
 
       const shift = data.shiftTotals || {};
-      document.getElementById('gross-earnings').textContent = formatCurrency(shift.grossEarnings);
+      const gross = parseFloat(shift.grossEarnings) || 0;
+      document.getElementById('gross-earnings').textContent = formatCurrency(gross);
 
       const eff = shift.efficiency || {};
       document.getElementById('per-hour').textContent = formatCurrency(eff.perHour);
       document.getElementById('per-mile').textContent = formatCurrency(eff.perMile);
       document.getElementById('total-miles').textContent = (shift.totalMiles || 0).toFixed(1);
 
+      // Apps Data & Bar Graph Calculations
       const apps = data.appsBreakdown || {};
-      document.getElementById('app-dd').textContent = formatCurrency(apps.doorDash);
-      document.getElementById('app-ue').textContent = formatCurrency(apps.uberEats);
-      document.getElementById('app-af').textContent = formatCurrency(apps.amazonFlex);
+      const ddAmt = parseFloat(apps.doorDash) || 0;
+      const ueAmt = parseFloat(apps.uberEats) || 0;
+      const afAmt = parseFloat(apps.amazonFlex) || 0;
+
+      document.getElementById('app-dd').textContent = formatCurrency(ddAmt);
+      document.getElementById('app-ue').textContent = formatCurrency(ueAmt);
+      document.getElementById('app-af').textContent = formatCurrency(afAmt);
+
+      // Relative bar width calculation based on highest earning app or total
+      const maxAmt = Math.max(ddAmt, ueAmt, afAmt, 1);
+      document.getElementById('bar-dd').style.width = `${(ddAmt / maxAmt) * 100}%`;
+      document.getElementById('bar-ue').style.width = `${(ueAmt / maxAmt) * 100}%`;
+      document.getElementById('bar-af').style.width = `${(afAmt / maxAmt) * 100}%`;
       
       if (data.lastUpdated) {
         const dateObj = new Date(data.lastUpdated);
