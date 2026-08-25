@@ -320,16 +320,12 @@
     </div>
   </div>
 
-<script>
-    const RAW_DROPBOX_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&raw=1';
+  <script>
+    const RAW_DROPBOX_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&st=i2b1or5c&raw=1';
 
     async function fetchToteData() {
-      // Add timestamp directly to Dropbox URL to bypass caching
       const timestampedUrl = RAW_DROPBOX_URL + '&t=' + Date.now();
-      
-      // Primary proxy: corsproxy.io
       const primaryProxy = 'https://corsproxy.io/?' + encodeURIComponent(timestampedUrl);
-      // Backup proxy: api.allorigins.win
       const backupProxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(timestampedUrl);
 
       let data = null;
@@ -339,13 +335,12 @@
         if (!response.ok) throw new Error(`Primary proxy HTTP ${response.status}`);
         data = await response.json();
       } catch (err) {
-        console.warn("Primary proxy failed, trying backup proxy...", err);
         try {
           const backupResponse = await fetch(backupProxy);
           if (!backupResponse.ok) throw new Error(`Backup proxy HTTP ${backupResponse.status}`);
           data = await backupResponse.json();
         } catch (backupErr) {
-          console.error("Both CORS proxies failed to load tote.json:", backupErr);
+          console.error("Both CORS proxies failed:", backupErr);
           return;
         }
       }
@@ -361,13 +356,24 @@
 
       const shift = data.shiftTotals || {};
       const gross = parseFloat(shift.grossEarnings) || 0;
+      const actualMiles = parseFloat(shift.actualMiles) || 0;
+      const offerMiles = parseFloat(shift.offerMiles) || parseFloat(shift.totalMiles) || 0;
+      const activeHours = parseFloat(shift.activeHours) || 0;
+
+      // Select active miles (prefers actual driven miles, falls back to estimated offer miles)
+      const milesUsed = actualMiles > 0 ? actualMiles : offerMiles;
+
+      // Dynamic JS Calculations
+      const perHour = activeHours > 0 ? (gross / activeHours) : 0;
+      const perMile = milesUsed > 0 ? (gross / milesUsed) : 0;
+
+      // Render Totals & Efficiency
       document.getElementById('gross-earnings').textContent = formatCurrency(gross);
+      document.getElementById('per-hour').textContent = formatCurrency(perHour);
+      document.getElementById('per-mile').textContent = formatCurrency(perMile);
+      document.getElementById('total-miles').textContent = milesUsed.toFixed(1);
 
-      const eff = shift.efficiency || {};
-      document.getElementById('per-hour').textContent = formatCurrency(eff.perHour);
-      document.getElementById('per-mile').textContent = formatCurrency(eff.perMile);
-      document.getElementById('total-miles').textContent = (shift.totalMiles || 0).toFixed(1);
-
+      // App Breakdown & Bar Fill
       const apps = data.appsBreakdown || {};
       const ddAmt = parseFloat(apps.doorDash) || 0;
       const ueAmt = parseFloat(apps.uberEats) || 0;
