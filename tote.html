@@ -1,303 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Papa Gigs Earnings Summary</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: rgba(15, 23, 42, 0.92);
-      --border-light: rgba(255, 255, 255, 0.1);
-      --text-main: #ffffff;
-      --text-muted: #94a3b8;
-      --accent-color: #00ff88;
-      --motto-color: #ffb703;
-      --dd-color: #ff3008;
-      --ue-color: #06c167;
-      --af-color: #ff9900;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background-color: transparent;
-      font-family: 'Inter', sans-serif;
-      color: var(--text-main);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-
-    /* Container with Moving Edge Glow */
-    .summary-card {
-      position: relative;
-      width: 440px;
-      background: var(--bg-color);
-      border: 2px solid transparent;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 0 25px rgba(0, 255, 136, 0.25);
-      backdrop-filter: blur(12px);
-      overflow: hidden;
-    }
-
-    /* Conic Gradient Layer for Edge Glow */
-    .summary-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: conic-gradient(
-        transparent, 
-        rgba(0, 255, 136, 0.1), 
-        var(--accent-color), 
-        rgba(0, 255, 136, 0.1), 
-        transparent 60%
-      );
-      animation: rotate-border 4s linear infinite;
-      z-index: 0;
-    }
-
-    /* Inner Dark Mask */
-    .summary-card::after {
-      content: '';
-      position: absolute;
-      inset: 2px;
-      background: var(--bg-color);
-      border-radius: 14px;
-      z-index: 1;
-    }
-
-    @keyframes rotate-border {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Raise Content Above Background Mask */
-    .header, .hero-section, .stats-grid, .apps-list {
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Header & Enlarged Logo */
-    .header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .brand-logo {
-      height: 72px;
-      width: 72px;
-      border-radius: 12px;
-      object-fit: cover;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-      border: 1px solid var(--border-light);
-    }
-
-    .title-area {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .title-main {
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      line-height: 1.1;
-    }
-
-    /* Fun Motto Font */
-    .motto-text {
-      font-family: 'Bangers', cursive;
-      font-size: 20px;
-      color: var(--motto-color);
-      letter-spacing: 1.5px;
-      margin-top: 2px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-
-    /* Hero Earnings Section */
-    .hero-section {
-      text-align: center;
-      margin-bottom: 18px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .hero-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 2px;
-    }
-
-    .hero-value {
-      font-size: 44px;
-      font-weight: 900;
-      color: var(--accent-color);
-      letter-spacing: -1px;
-      line-height: 1;
-    }
-
-    /* Quick Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .stat-box {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-light);
-      border-radius: 10px;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .stat-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    /* App Rows with Dynamic Visual Bars */
-    .apps-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .app-row {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      padding: 12px 20px;
-      overflow: hidden;
-    }
-
-    .bar-fill {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 0%;
-      opacity: 0.18;
-      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1;
-    }
-
-    .app-row.dd .bar-fill { background-color: var(--dd-color); }
-    .app-row.ue .bar-fill { background-color: var(--ue-color); }
-    .app-row.af .bar-fill { background-color: var(--af-color); }
-
-    .app-logo {
-      position: relative;
-      z-index: 2;
-      height: 42px;
-      max-width: 140px;
-      object-fit: contain;
-    }
-
-    .app-amount {
-      position: relative;
-      z-index: 2;
-      font-size: 20px;
-      font-weight: 800;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="summary-card">
-    <!-- Header -->
-    <div class="header">
-      <div class="brand">
-        <img src="logo.jpg" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
-        <div class="title-area">
-          <span class="title-main" id="streamer-name">PAPA GIGS</span>
-          <span class="motto-text" id="channel-motto">WE'RE ROLLIN'</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Total Earnings -->
-    <div class="hero-section">
-      <div class="hero-label">Shift Earnings</div>
-      <div class="hero-value" id="gross-earnings">$0.00</div>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-label">$/HOUR</div>
-        <div class="stat-value" id="per-hour">$0.00</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">$/MILE</div>
-        <div class="stat-value" id="per-mile">$0.00</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">MILES</div>
-        <div class="stat-value" id="total-miles">0.0</div>
-      </div>
-    </div>
-
-    <!-- Apps Breakdown -->
-    <div class="apps-list">
-      <!-- DoorDash -->
-      <div class="app-row dd">
-        <div class="bar-fill" id="bar-dd"></div>
-        <img src="https://www.dropbox.com/scl/fi/qqoansmx8y0iq6t9jmsho/dd-logo.png?rlkey=tv5yfn4i8844uhwrhy7mcntrx&st=vg5bd32h&raw=1" alt="DoorDash" class="app-logo">
-        <div class="app-amount" id="app-dd">$0.00</div>
-      </div>
-
-      <!-- Uber Eats -->
-      <div class="app-row ue">
-        <div class="bar-fill" id="bar-ue"></div>
-        <img src="https://www.dropbox.com/scl/fi/pz9u95lu4yblbcvhurt8g/uber-eats-logo.png?rlkey=euda6oskb5ddsuc2tt4jwls2p&st=gdpfdvmr&raw=1" alt="Uber Eats" class="app-logo">
-        <div class="app-amount" id="app-ue">$0.00</div>
-      </div>
-
-      <!-- Amazon Flex -->
-      <div class="app-row af">
-        <div class="bar-fill" id="bar-af"></div>
-        <img src="https://www.dropbox.com/scl/fi/78v8w88f7dn57opphgcx1/flex-logo1.png?rlkey=i5fky0mtxxj860l4bnj4g4g4u&st=0u54ixn7&raw=1" alt="Amazon Flex" class="app-logo">
-        <div class="app-amount" id="app-af">$0.00</div>
-      </div>
-    </div>
-  </div>
-
-  <script>
+<script>
     const RAW_DROPBOX_URL = 'https://www.dropbox.com/scl/fi/71ehr6zkwms82ntq3y5bh/tote.json?rlkey=c9q7jm8utds64efvj70u9tgbm&st=i2b1or5c&raw=1';
 
     async function fetchToteData() {
@@ -332,7 +33,16 @@
       if (data.motto) document.getElementById('channel-motto').textContent = data.motto;
 
       const shift = data.shiftTotals || {};
-      const gross = parseFloat(shift.grossEarnings) || 0;
+      const apps = data.appsBreakdown || {};
+
+      const ddAmt = parseFloat(apps.doorDash) || 0;
+      const ueAmt = parseFloat(apps.uberEats) || 0;
+      const afAmt = parseFloat(apps.amazonFlex) || 0;
+
+      // Sum the 3 app subtotals
+      const sumApps = ddAmt + ueAmt + afAmt;
+      const gross = sumApps > 0 ? sumApps : (parseFloat(shift.grossEarnings) || 0);
+
       const actualMiles = parseFloat(shift.actualMiles) || 0;
       const offerMiles = parseFloat(shift.offerMiles) || parseFloat(shift.totalMiles) || 0;
       const activeHours = parseFloat(shift.activeHours) || 0;
@@ -342,16 +52,13 @@
       const perHour = activeHours > 0 ? (gross / activeHours) : 0;
       const perMile = milesUsed > 0 ? (gross / milesUsed) : 0;
 
+      // Render Shift Earnings & Metrics
       document.getElementById('gross-earnings').textContent = formatCurrency(gross);
       document.getElementById('per-hour').textContent = formatCurrency(perHour);
       document.getElementById('per-mile').textContent = formatCurrency(perMile);
       document.getElementById('total-miles').textContent = milesUsed.toFixed(1);
 
-      const apps = data.appsBreakdown || {};
-      const ddAmt = parseFloat(apps.doorDash) || 0;
-      const ueAmt = parseFloat(apps.uberEats) || 0;
-      const afAmt = parseFloat(apps.amazonFlex) || 0;
-
+      // Render App Subtotals & Bar Fills
       document.getElementById('app-dd').textContent = formatCurrency(ddAmt);
       document.getElementById('app-ue').textContent = formatCurrency(ueAmt);
       document.getElementById('app-af').textContent = formatCurrency(afAmt);
@@ -370,5 +77,3 @@
     fetchToteData();
     setInterval(fetchToteData, 10000);
   </script>
-</body>
-</html>
