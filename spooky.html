@@ -34,7 +34,7 @@
       transform: translateX(-50%);
       display: flex;
       gap: 35px;
-      color: rgba(230, 230, 230, 0.7);
+      color: rgba(240, 240, 240, 0.8);
       font-size: 16px;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -43,7 +43,7 @@
       z-index: 10;
     }
 
-    /* Vector Web (Top Left Corner) */
+    /* Vector Cobweb (Top Left Corner) */
     .cobweb {
       position: absolute;
       top: 0;
@@ -55,7 +55,7 @@
       z-index: 5;
     }
 
-    /* Canvas Layer for Fog, Bats & Screaming Apparition */
+    /* Canvas Layer for Fog, Bats, Spider & Screaming Apparition */
     canvas {
       position: absolute;
       top: 0;
@@ -71,17 +71,11 @@
   <div id="overlay-container">
     <canvas id="overlayCanvas"></canvas>
 
-    <!-- Vector Cobweb & Swaying Spider -->
+    <!-- Vector Cobweb -->
     <svg class="cobweb" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <path d="M 0,0 L 200,0 M 0,0 L 180,60 M 0,0 L 140,140 M 0,0 L 60,180 M 0,0 L 0,200" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none"/>
-      <path d="M 40,0 Q 35,20 0,40 M 80,0 Q 70,45 0,80 M 120,0 Q 100,70 0,120 M 160,0 Q 130,100 0,160 M 200,0 Q 150,150 0,200" stroke="rgba(255,255,255,0.22)" stroke-width="1" fill="none"/>
-      <path d="M 30,10 Q 25,25 10,30 M 60,20 Q 50,50 20,60 M 90,30 Q 75,75 30,90 M 120,40 Q 100,100 40,120" stroke="rgba(255,255,255,0.15)" stroke-width="0.8" fill="none"/>
-      <line x1="100" y1="50" x2="100" y2="120" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
-      <g transform="translate(96, 120)">
-        <ellipse cx="4" cy="5" rx="3" ry="4" fill="rgba(220,220,220,0.6)"/>
-        <circle cx="4" cy="2" r="2" fill="rgba(220,220,220,0.6)"/>
-        <path d="M 1,2 Q -3,0 -2,5 M 7,2 Q 11,0 10,5 M 1,5 Q -4,5 -3,9 M 7,5 Q 12,5 11,9" stroke="rgba(220,220,220,0.6)" stroke-width="0.8" fill="none"/>
-      </g>
+      <path d="M 0,0 L 200,0 M 0,0 L 180,60 M 0,0 L 140,140 M 0,0 L 60,180 M 0,0 L 0,200" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" fill="none"/>
+      <path d="M 40,0 Q 35,20 0,40 M 80,0 Q 70,45 0,80 M 120,0 Q 100,70 0,120 M 160,0 Q 130,100 0,160 M 200,0 Q 150,150 0,200" stroke="rgba(255,255,255,0.25)" stroke-width="1" fill="none"/>
+      <path d="M 30,10 Q 25,25 10,30 M 60,20 Q 50,50 20,60 M 90,30 Q 75,75 30,90 M 120,40 Q 100,100 40,120" stroke="rgba(255,255,255,0.18)" stroke-width="0.8" fill="none"/>
     </svg>
 
     <!-- Shift Metrics Header -->
@@ -102,45 +96,46 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // 1. Moving Volumetric Fog Particles
+    // 1. Visible Moving Volumetric Fog Particles
     const fogParticles = [];
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 20; i++) {
       fogParticles.push({
         x: Math.random() * canvas.width,
-        y: canvas.height - (Math.random() * 380),
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.18,
-        radius: 180 + Math.random() * 220,
-        opacity: 0.02 + Math.random() * 0.03
+        y: canvas.height - (Math.random() * 450),
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.2,
+        radius: 200 + Math.random() * 250,
+        opacity: 0.08 + Math.random() * 0.07
       });
     }
 
-    // 2. Disturbing Apparition State Engine
+    // 2. Disturbing Screaming Apparition
     const ghost = {
       x: canvas.width * 0.75,
-      y: canvas.height * 0.5,
+      y: canvas.height * 0.45,
       targetX: canvas.width * 0.75,
-      targetY: canvas.height * 0.5,
+      targetY: canvas.height * 0.45,
       opacity: 0,
       targetOpacity: 0,
       scale: 1.0,
       state: 'dormant',
       jawOpen: 0,
-      targetJawOpen: 0,
-      eyeWidth: 1.0
+      targetJawOpen: 0
     };
 
     function scheduleSpook() {
+      // First spawn happens fast (5s), subsequent ones every 15-30s
       const delay = ghost.state === 'dormant' 
-        ? (25000 + Math.random() * 35000) // Appears randomly every 25-60 seconds
-        : (9000 + Math.random() * 12000);  // Stays visible for 9-12 seconds
+        ? (ghost.opacity === 0 && !ghost.hasSpawnedOnce ? 5000 : (15000 + Math.random() * 20000))
+        : (10000 + Math.random() * 8000);  // Visible for 10-18s
 
       setTimeout(() => {
+        ghost.hasSpawnedOnce = true;
         if (ghost.state === 'dormant') {
-          ghost.targetX = canvas.width * (0.55 + Math.random() * 0.30);
-          ghost.targetY = canvas.height * (0.35 + Math.random() * 0.30);
-          ghost.targetOpacity = 0.45 + Math.random() * 0.20;
-          ghost.targetJawOpen = Math.random() > 0.3 ? 0.85 : 0.25; // Randomly scream or hollow face
+          ghost.targetX = canvas.width * (0.50 + Math.random() * 0.35);
+          ghost.targetY = canvas.height * (0.30 + Math.random() * 0.35);
+          ghost.targetOpacity = 0.65 + Math.random() * 0.25;
+          ghost.targetJawOpen = Math.random() > 0.3 ? 0.9 : 0.3; // Screaming mouth
           ghost.state = 'fadingIn';
         } else if (ghost.state === 'active') {
           ghost.targetOpacity = 0;
@@ -154,19 +149,111 @@
     // 3. Bat Swarm
     const bats = [];
     function spawnBat() {
-      if (bats.length < 5 && Math.random() < 0.04) {
+      if (bats.length < 5 && Math.random() < 0.05) {
         bats.push({
           x: -40,
           y: Math.random() * (canvas.height * 0.65),
-          vx: 3 + Math.random() * 3.5,
-          vy: (Math.random() - 0.5) * 1.5,
+          vx: 3.5 + Math.random() * 3.5,
+          vy: (Math.random() - 0.5) * 1.8,
           wingPhase: Math.random() * Math.PI * 2,
           size: 16 + Math.random() * 14
         });
       }
     }
 
-    // Render Helpers
+    // 4. Crawling & Swaying Spider
+    const spider = {
+      x: 140, // Drops from top-left web area
+      y: 40,
+      targetY: 180,
+      threadLength: 40,
+      state: 'descending', // descending, waiting, ascending
+      waitTimer: 0,
+      legPhase: 0
+    };
+
+    function updateSpider() {
+      spider.legPhase += 0.15;
+
+      if (spider.state === 'descending') {
+        spider.y += 0.6;
+        if (spider.y >= spider.targetY) {
+          spider.state = 'waiting';
+          spider.waitTimer = 180 + Math.random() * 240; // pause at bottom
+        }
+      } else if (spider.state === 'waiting') {
+        spider.waitTimer--;
+        if (spider.waitTimer <= 0) {
+          spider.state = 'ascending';
+          spider.targetY = 30 + Math.random() * 30;
+        }
+      } else if (spider.state === 'ascending') {
+        spider.y -= 0.5;
+        if (spider.y <= spider.targetY) {
+          spider.state = 'descending';
+          spider.targetY = 140 + Math.random() * 120;
+        }
+      }
+    }
+
+    function drawSpider() {
+      updateSpider();
+
+      const swing = Math.sin(spider.legPhase * 0.3) * 4;
+      const currentX = spider.x + swing;
+
+      ctx.save();
+      
+      // Silk Thread
+      ctx.beginPath();
+      ctx.moveTo(spider.x, 0);
+      ctx.lineTo(currentX, spider.y);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Spider Body & Legs
+      ctx.translate(currentX, spider.y);
+
+      // Abdomen & Cephalothorax
+      ctx.fillStyle = 'rgba(25, 28, 32, 0.95)';
+      ctx.beginPath();
+      ctx.ellipse(0, 6, 5, 7, 0, 0, Math.PI * 2); // Main body
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, 4, 0, Math.PI * 2); // Head
+      ctx.fill();
+
+      // Glowing Eyes
+      ctx.fillStyle = 'rgba(255, 200, 200, 0.8)';
+      ctx.fillRect(-1.5, -2, 1, 1);
+      ctx.fillRect(0.5, -2, 1, 1);
+
+      // Animated Crawling Legs (4 on each side)
+      ctx.strokeStyle = 'rgba(25, 28, 32, 0.95)';
+      ctx.lineWidth = 1.2;
+
+      for (let side of [-1, 1]) {
+        for (let i = 0; i < 4; i++) {
+          const legMove = Math.sin(spider.legPhase + i) * (spider.state === 'waiting' ? 0.8 : 3);
+          const yOffset = (i * 2.5) - 2;
+
+          ctx.beginPath();
+          ctx.moveTo(side * 2, yOffset);
+          ctx.quadraticCurveTo(
+            side * (10 + i), 
+            yOffset - 6 + legMove, 
+            side * (12 + i * 1.5), 
+            yOffset + 4 + legMove
+          );
+          ctx.stroke();
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // Render Loop
     function drawFogParticle(p) {
       p.x += p.vx;
       p.y += p.vy;
@@ -174,8 +261,8 @@
       if (p.x > canvas.width + p.radius) p.x = -p.radius;
 
       const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-      grad.addColorStop(0, `rgba(200, 210, 225, ${p.opacity})`);
-      grad.addColorStop(0.6, `rgba(140, 155, 170, ${p.opacity * 0.3})`);
+      grad.addColorStop(0, `rgba(210, 220, 235, ${p.opacity})`);
+      grad.addColorStop(0.5, `rgba(150, 165, 180, ${p.opacity * 0.4})`);
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       ctx.fillStyle = grad;
@@ -189,7 +276,7 @@
 
       ghost.x += (ghost.targetX - ghost.x) * 0.008;
       ghost.y += (ghost.targetY - ghost.y) * 0.008;
-      ghost.opacity += (ghost.targetOpacity - ghost.opacity) * 0.015;
+      ghost.opacity += (ghost.targetOpacity - ghost.opacity) * 0.018;
       ghost.jawOpen += (ghost.targetJawOpen - ghost.jawOpen) * 0.04;
 
       if (ghost.state === 'fadingIn' && Math.abs(ghost.opacity - ghost.targetOpacity) < 0.05) {
@@ -203,19 +290,19 @@
       ctx.translate(ghost.x, ghost.y);
 
       // Pale Smoky Mask / Face Shroud
-      const radius = 200;
+      const radius = 210;
       const faceGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, radius);
       const baseAlpha = ghost.opacity;
       
-      faceGrad.addColorStop(0, `rgba(225, 230, 235, ${baseAlpha * 0.70})`);
-      faceGrad.addColorStop(0.35, `rgba(160, 170, 185, ${baseAlpha * 0.35})`);
-      faceGrad.addColorStop(0.7, `rgba(80, 90, 105, ${baseAlpha * 0.10})`);
+      faceGrad.addColorStop(0, `rgba(235, 240, 245, ${baseAlpha * 0.85})`);
+      faceGrad.addColorStop(0.35, `rgba(170, 180, 195, ${baseAlpha * 0.45})`);
+      faceGrad.addColorStop(0.7, `rgba(90, 100, 115, ${baseAlpha * 0.15})`);
       faceGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       ctx.fillStyle = faceGrad;
       ctx.beginPath();
       for (let angle = 0; angle < Math.PI * 2; angle += 0.12) {
-        const distortion = Math.sin(angle * 4 + time * 0.002) * 14;
+        const distortion = Math.sin(angle * 4 + time * 0.002) * 16;
         const r = radius + distortion;
         const lx = Math.cos(angle) * r;
         const ly = Math.sin(angle) * r;
@@ -225,27 +312,27 @@
       ctx.closePath();
       ctx.fill();
 
-      // Sunken Dark Feature Voids (Eyes & Screaming Mouth)
-      ctx.fillStyle = `rgba(8, 10, 14, ${baseAlpha * 0.95})`;
+      // Dark Hollow Voids (Eyes & Screaming Mouth)
+      ctx.fillStyle = `rgba(5, 7, 10, ${baseAlpha * 0.98})`;
 
-      const eyeOffset = 48;
-      const eyeSizeY = 32;
-      const eyeSizeX = 23;
+      const eyeOffset = 50;
+      const eyeSizeY = 34;
+      const eyeSizeX = 24;
 
       // Left Eye Void
       ctx.beginPath();
-      ctx.ellipse(-eyeOffset, -25, eyeSizeX, eyeSizeY, 0.1, 0, Math.PI * 2);
+      ctx.ellipse(-eyeOffset, -28, eyeSizeX, eyeSizeY, 0.1, 0, Math.PI * 2);
       ctx.fill();
 
       // Right Eye Void
       ctx.beginPath();
-      ctx.ellipse(eyeOffset, -25, eyeSizeX, eyeSizeY, -0.1, 0, Math.PI * 2);
+      ctx.ellipse(eyeOffset, -28, eyeSizeX, eyeSizeY, -0.1, 0, Math.PI * 2);
       ctx.fill();
 
       // Elongated Screaming Mouth Void
-      const mouthY = 52 + (ghost.jawOpen * 16);
-      const mouthWidth = 32;
-      const mouthHeight = 52 + (ghost.jawOpen * 48);
+      const mouthY = 55 + (ghost.jawOpen * 18);
+      const mouthWidth = 34;
+      const mouthHeight = 55 + (ghost.jawOpen * 52);
 
       ctx.beginPath();
       ctx.ellipse(0, mouthY, mouthWidth, mouthHeight, 0, 0, Math.PI * 2);
@@ -268,7 +355,7 @@
         }
 
         ctx.save();
-        ctx.fillStyle = 'rgba(18, 20, 24, 0.75)';
+        ctx.fillStyle = 'rgba(18, 20, 24, 0.85)';
         ctx.translate(b.x, b.y);
         
         const flap = Math.sin(b.wingPhase) * b.size * 0.4;
@@ -288,11 +375,18 @@
     function loop(time) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // 1. Fog
       for (let i = 0; i < fogParticles.length; i++) {
         drawFogParticle(fogParticles[i]);
       }
 
+      // 2. Spider
+      drawSpider();
+
+      // 3. Bats
       animateBats();
+
+      // 4. Ghost
       drawApparition(time);
 
       requestAnimationFrame(loop);
