@@ -55,7 +55,7 @@
       z-index: 5;
     }
 
-    /* Canvas Layer for Fog, Bats, Spider & Screaming Apparition */
+    /* Canvas Layer for Overlay */
     canvas {
       position: absolute;
       top: 0;
@@ -96,7 +96,7 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // 1. Visible Moving Volumetric Fog Particles
+    // 1. Moving Volumetric Fog Particles
     const fogParticles = [];
     for (let i = 0; i < 20; i++) {
       fogParticles.push({
@@ -109,7 +109,7 @@
       });
     }
 
-    // 2. Disturbing Screaming Apparition
+    // 2. Screaming Main Ghost Apparition
     const ghost = {
       x: canvas.width * 0.75,
       y: canvas.height * 0.45,
@@ -120,14 +120,14 @@
       scale: 1.0,
       state: 'dormant',
       jawOpen: 0,
-      targetJawOpen: 0
+      targetJawOpen: 0,
+      hasSpawnedOnce: false
     };
 
     function scheduleSpook() {
-      // First spawn happens fast (5s), subsequent ones every 15-30s
       const delay = ghost.state === 'dormant' 
-        ? (ghost.opacity === 0 && !ghost.hasSpawnedOnce ? 5000 : (15000 + Math.random() * 20000))
-        : (10000 + Math.random() * 8000);  // Visible for 10-18s
+        ? (ghost.opacity === 0 && !ghost.hasSpawnedOnce ? 4000 : (15000 + Math.random() * 20000))
+        : (10000 + Math.random() * 8000);
 
       setTimeout(() => {
         ghost.hasSpawnedOnce = true;
@@ -135,7 +135,7 @@
           ghost.targetX = canvas.width * (0.50 + Math.random() * 0.35);
           ghost.targetY = canvas.height * (0.30 + Math.random() * 0.35);
           ghost.targetOpacity = 0.65 + Math.random() * 0.25;
-          ghost.targetJawOpen = Math.random() > 0.3 ? 0.9 : 0.3; // Screaming mouth
+          ghost.targetJawOpen = Math.random() > 0.3 ? 0.9 : 0.3;
           ghost.state = 'fadingIn';
         } else if (ghost.state === 'active') {
           ghost.targetOpacity = 0;
@@ -146,7 +146,173 @@
     }
     scheduleSpook();
 
-    // 3. Bat Swarm
+    // 3. Subtle Floating Background Mini-Apparitions
+    const miniGhosts = [];
+    function spawnMiniGhost() {
+      if (miniGhosts.length < 3 && Math.random() < 0.03) {
+        miniGhosts.push({
+          x: Math.random() * canvas.width,
+          y: 100 + Math.random() * (canvas.height - 250),
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: -0.2 - Math.random() * 0.4,
+          opacity: 0,
+          maxOpacity: 0.15 + Math.random() * 0.2,
+          radius: 35 + Math.random() * 25,
+          life: 0,
+          maxLife: 250 + Math.random() * 200
+        });
+      }
+    }
+
+    function drawMiniGhosts() {
+      spawnMiniGhost();
+      for (let i = miniGhosts.length - 1; i >= 0; i--) {
+        const mg = miniGhosts[i];
+        mg.life++;
+        mg.x += mg.vx + Math.sin(mg.life * 0.03) * 0.5;
+        mg.y += mg.vy;
+
+        // Fade in/out cycle
+        if (mg.life < 50) {
+          mg.opacity = (mg.life / 50) * mg.maxOpacity;
+        } else if (mg.life > mg.maxLife - 50) {
+          mg.opacity = ((mg.maxLife - mg.life) / 50) * mg.maxOpacity;
+        }
+
+        if (mg.life >= mg.maxLife) {
+          miniGhosts.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.translate(mg.x, mg.y);
+
+        // Soft wispy sphere
+        const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, mg.radius);
+        grad.addColorStop(0, `rgba(220, 230, 240, ${mg.opacity})`);
+        grad.addColorStop(0.5, `rgba(160, 180, 200, ${mg.opacity * 0.5})`);
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, mg.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Dark hollow eyes
+        ctx.fillStyle = `rgba(10, 12, 16, ${mg.opacity * 0.9})`;
+        ctx.beginPath();
+        ctx.ellipse(-mg.radius * 0.25, -mg.radius * 0.1, mg.radius * 0.12, mg.radius * 0.18, 0, 0, Math.PI * 2);
+        ctx.ellipse(mg.radius * 0.25, -mg.radius * 0.1, mg.radius * 0.12, mg.radius * 0.18, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    // 4. Fast Swooping Flying Witch Silhouette
+    const witch = {
+      x: -120,
+      y: 120,
+      vx: 0,
+      vy: 0,
+      scale: 0.85,
+      active: false,
+      timer: 0
+    };
+
+    function triggerWitch() {
+      if (!witch.active && Math.random() < 0.02) {
+        witch.active = true;
+        witch.x = -120;
+        witch.y = 80 + Math.random() * 140;
+        witch.vx = 7 + Math.random() * 5; // Fast flight
+        witch.vy = (Math.random() - 0.5) * 1.2;
+      }
+    }
+
+    function drawWitch() {
+      triggerWitch();
+
+      if (!witch.active) return;
+
+      witch.x += witch.vx;
+      witch.y += witch.vy + Math.sin(witch.x * 0.02) * 1.2; // Arc undulating wave flight
+
+      if (witch.x > canvas.width + 120) {
+        witch.active = false;
+        return;
+      }
+
+      ctx.save();
+      ctx.translate(witch.x, witch.y);
+      ctx.scale(witch.scale, witch.scale);
+
+      // Dark silhouette color
+      ctx.fillStyle = 'rgba(15, 16, 20, 0.88)';
+
+      // --- Broom Stick ---
+      ctx.beginPath();
+      ctx.rect(-50, 8, 90, 3);
+      ctx.fill();
+
+      // Broom Bristles / Tail
+      ctx.beginPath();
+      ctx.moveTo(-50, 9);
+      ctx.lineTo(-75, 1);
+      ctx.lineTo(-78, 16);
+      ctx.closePath();
+      ctx.fill();
+
+      // --- Witch Body ---
+      // Dress / Cloak
+      ctx.beginPath();
+      ctx.moveTo(-15, 8);
+      ctx.lineTo(-30, 25);
+      ctx.lineTo(5, 22);
+      ctx.closePath();
+      ctx.fill();
+
+      // Head
+      ctx.beginPath();
+      ctx.arc(0, -8, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pointy Nose & Chin Silhouette
+      ctx.beginPath();
+      ctx.moveTo(4, -8);
+      ctx.lineTo(12, -6);
+      ctx.lineTo(5, -3);
+      ctx.closePath();
+      ctx.fill();
+
+      // --- Pointed Witch Hat ---
+      // Hat Brim
+      ctx.beginPath();
+      ctx.ellipse(0, -13, 16, 3, -0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pointy Hat Cone
+      ctx.beginPath();
+      ctx.moveTo(-8, -14);
+      ctx.lineTo(12, -38);
+      ctx.lineTo(6, -14);
+      ctx.closePath();
+      ctx.fill();
+
+      // --- Black Cat Sitting on Back of Broom ---
+      ctx.beginPath();
+      ctx.arc(-34, 3, 4, 0, Math.PI * 2); // Body
+      ctx.arc(-34, -2, 3, 0, Math.PI * 2); // Head
+      ctx.fill();
+
+      // Glowing Green Cat Eye
+      ctx.fillStyle = '#00ff88';
+      ctx.fillRect(-33, -3, 1, 1);
+
+      ctx.restore();
+    }
+
+    // 5. Bat Swarm
     const bats = [];
     function spawnBat() {
       if (bats.length < 5 && Math.random() < 0.05) {
@@ -161,13 +327,43 @@
       }
     }
 
-    // 4. Crawling & Swaying Spider
+    function animateBats() {
+      spawnBat();
+      for (let i = bats.length - 1; i >= 0; i--) {
+        const b = bats[i];
+        b.x += b.vx;
+        b.y += b.vy + Math.sin(b.wingPhase) * 1.5;
+        b.wingPhase += 0.3;
+
+        if (b.x > canvas.width + 50) {
+          bats.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(18, 20, 24, 0.85)';
+        ctx.translate(b.x, b.y);
+        
+        const flap = Math.sin(b.wingPhase) * b.size * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-b.size*0.5, -b.size*0.3 + flap, -b.size, -flap);
+        ctx.quadraticCurveTo(-b.size*0.4, b.size*0.1, 0, b.size*0.1);
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(b.size*0.5, -b.size*0.3 + flap, b.size, -flap);
+        ctx.quadraticCurveTo(b.size*0.4, b.size*0.1, 0, b.size*0.1);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // 6. Crawling & Swaying Spider
     const spider = {
-      x: 140, // Drops from top-left web area
+      x: 140,
       y: 40,
       targetY: 180,
-      threadLength: 40,
-      state: 'descending', // descending, waiting, ascending
+      state: 'descending',
       waitTimer: 0,
       legPhase: 0
     };
@@ -179,7 +375,7 @@
         spider.y += 0.6;
         if (spider.y >= spider.targetY) {
           spider.state = 'waiting';
-          spider.waitTimer = 180 + Math.random() * 240; // pause at bottom
+          spider.waitTimer = 180 + Math.random() * 240;
         }
       } else if (spider.state === 'waiting') {
         spider.waitTimer--;
@@ -215,13 +411,12 @@
       // Spider Body & Legs
       ctx.translate(currentX, spider.y);
 
-      // Abdomen & Cephalothorax
       ctx.fillStyle = 'rgba(25, 28, 32, 0.95)';
       ctx.beginPath();
-      ctx.ellipse(0, 6, 5, 7, 0, 0, Math.PI * 2); // Main body
+      ctx.ellipse(0, 6, 5, 7, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(0, 0, 4, 0, Math.PI * 2); // Head
+      ctx.arc(0, 0, 4, 0, Math.PI * 2);
       ctx.fill();
 
       // Glowing Eyes
@@ -229,7 +424,7 @@
       ctx.fillRect(-1.5, -2, 1, 1);
       ctx.fillRect(0.5, -2, 1, 1);
 
-      // Animated Crawling Legs (4 on each side)
+      // Legs
       ctx.strokeStyle = 'rgba(25, 28, 32, 0.95)';
       ctx.lineWidth = 1.2;
 
@@ -289,7 +484,6 @@
       ctx.save();
       ctx.translate(ghost.x, ghost.y);
 
-      // Pale Smoky Mask / Face Shroud
       const radius = 210;
       const faceGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, radius);
       const baseAlpha = ghost.opacity;
@@ -312,24 +506,21 @@
       ctx.closePath();
       ctx.fill();
 
-      // Dark Hollow Voids (Eyes & Screaming Mouth)
+      // Dark Hollow Voids
       ctx.fillStyle = `rgba(5, 7, 10, ${baseAlpha * 0.98})`;
 
       const eyeOffset = 50;
       const eyeSizeY = 34;
       const eyeSizeX = 24;
 
-      // Left Eye Void
       ctx.beginPath();
       ctx.ellipse(-eyeOffset, -28, eyeSizeX, eyeSizeY, 0.1, 0, Math.PI * 2);
       ctx.fill();
 
-      // Right Eye Void
       ctx.beginPath();
       ctx.ellipse(eyeOffset, -28, eyeSizeX, eyeSizeY, -0.1, 0, Math.PI * 2);
       ctx.fill();
 
-      // Elongated Screaming Mouth Void
       const mouthY = 55 + (ghost.jawOpen * 18);
       const mouthWidth = 34;
       const mouthHeight = 55 + (ghost.jawOpen * 52);
@@ -339,37 +530,6 @@
       ctx.fill();
 
       ctx.restore();
-    }
-
-    function animateBats() {
-      spawnBat();
-      for (let i = bats.length - 1; i >= 0; i--) {
-        const b = bats[i];
-        b.x += b.vx;
-        b.y += b.vy + Math.sin(b.wingPhase) * 1.5;
-        b.wingPhase += 0.3;
-
-        if (b.x > canvas.width + 50) {
-          bats.splice(i, 1);
-          continue;
-        }
-
-        ctx.save();
-        ctx.fillStyle = 'rgba(18, 20, 24, 0.85)';
-        ctx.translate(b.x, b.y);
-        
-        const flap = Math.sin(b.wingPhase) * b.size * 0.4;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.quadraticCurveTo(-b.size*0.5, -b.size*0.3 + flap, -b.size, -flap);
-        ctx.quadraticCurveTo(-b.size*0.4, b.size*0.1, 0, b.size*0.1);
-        ctx.moveTo(0, 0);
-        ctx.quadraticCurveTo(b.size*0.5, -b.size*0.3 + flap, b.size, -flap);
-        ctx.quadraticCurveTo(b.size*0.4, b.size*0.1, 0, b.size*0.1);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-      }
     }
 
     function loop(time) {
@@ -383,10 +543,16 @@
       // 2. Spider
       drawSpider();
 
-      // 3. Bats
+      // 3. Mini Apparitions
+      drawMiniGhosts();
+
+      // 4. Bats
       animateBats();
 
-      // 4. Ghost
+      // 5. Flying Witch
+      drawWitch();
+
+      // 6. Screaming Ghost
       drawApparition(time);
 
       requestAnimationFrame(loop);
