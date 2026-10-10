@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Papa Gigs Halloween Shift Tote Board</title>
+  <title>Spooky Stream Overlay</title>
   <style>
     * {
       box-sizing: border-box;
@@ -11,56 +11,62 @@
       padding: 0;
     }
 
-    body {
-      background-color: #000;
-      color: #fff;
-      font-family: 'Courier New', Courier, monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    body, html {
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
+      background-color: transparent;
+      font-family: 'Courier New', Courier, monospace;
     }
 
-    /* Main Container Frame */
-    .tote-board-wrapper {
+    #overlay-container {
       position: relative;
-      width: 1000px;
-      height: 650px;
-      background: url('https://i.imgur.com/image_1.png') no-repeat center center;
-      background-size: contain;
-      border-radius: 8px;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
     }
 
-    /* Transparent WebM Video Layer */
-    .spooky-webm-overlay {
+    /* Full-Screen WebM Background Video Layer */
+    #bg-video {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      pointer-events: none; /* Allows click-throughs in OBS preview */
-      z-index: 10;          /* Renders on top of the background layout */
+      pointer-events: none;
+      z-index: 0;
     }
 
-    /* Content Area Layered Below WebM */
-    .tote-board-content {
-      position: relative;
-      z-index: 1;
+    /* Vector Cobweb (Top Left Corner) */
+    .cobweb {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 320px;
+      height: 320px;
+      opacity: 0.85;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.9));
+      z-index: 5;
+    }
+
+    /* Canvas Layer for Fog, Bats, Spider & Screaming Apparition */
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      padding: 20px;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
 
-  <div class="tote-board-wrapper">
-    
-    <!-- Transparent WebM Asset Overlay -->
+  <div id="overlay-container">
+    <!-- WebM Alpha Video Layer in Background -->
     <video 
-      class="spooky-webm-overlay" 
+      id="bg-video" 
       src="https://www.dropbox.com/scl/fi/8bic4d2dliz7eeiq3gkdo/0825.webm?rlkey=a3jexovspw5ierfskwjxukmly&st=2kouadgh&raw=1" 
       autoplay 
       loop 
@@ -68,12 +74,64 @@
       playsinline>
     </video>
 
-    <!-- Board Data Container -->
-    <div class="tote-board-content">
-      <!-- Your live JSON fetch scripts and layout elements go here -->
-    </div>
+    <canvas id="overlayCanvas"></canvas>
 
+    <!-- Vector Cobweb -->
+    <svg class="cobweb" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 0,0 L 200,0 M 0,0 L 180,60 M 0,0 L 140,140 M 0,0 L 60,180 M 0,0 L 0,200" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" fill="none"/>
+      <path d="M 40,0 Q 35,20 0,40 M 80,0 Q 70,45 0,80 M 120,0 Q 100,70 0,120 M 160,0 Q 130,100 0,160 M 200,0 Q 150,150 0,200" stroke="rgba(255,255,255,0.25)" stroke-width="1" fill="none"/>
+      <path d="M 30,10 Q 25,25 10,30 M 60,20 Q 50,50 20,60 M 90,30 Q 75,75 30,90 M 120,40 Q 100,100 40,120" stroke="rgba(255,255,255,0.18)" stroke-width="0.8" fill="none"/>
+    </svg>
   </div>
 
-</body>
-</html>
+  <script>
+    const canvas = document.getElementById('overlayCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // 1. Visible Moving Volumetric Fog Particles
+    const fogParticles = [];
+    for (let i = 0; i < 20; i++) {
+      fogParticles.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height - (Math.random() * 450),
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.2,
+        radius: 200 + Math.random() * 250,
+        opacity: 0.08 + Math.random() * 0.07
+      });
+    }
+
+    // 2. Disturbing Screaming Apparition
+    const ghost = {
+      x: canvas.width * 0.75,
+      y: canvas.height * 0.45,
+      targetX: canvas.width * 0.75,
+      targetY: canvas.height * 0.45,
+      opacity: 0,
+      targetOpacity: 0,
+      scale: 1.0,
+      state: 'dormant',
+      jawOpen: 0,
+      targetJawOpen: 0
+    };
+
+    function scheduleSpook() {
+      // First spawn happens fast (5s), subsequent ones every 15-30s
+      const delay = ghost.state === 'dormant' 
+        ? (ghost.opacity === 0 && !ghost.hasSpawnedOnce ? 5000 : (15000 + Math.random() * 20000))
+        : (10000 + Math.random() * 8000);  // Visible for 10-18s
+
+      setTimeout(() => {
+        ghost.hasSpawnedOnce = true;
+        if (ghost.state === 'dormant') {
+          ghost.targetX = canvas.width * (0.50 + Math.random() * 0.35);
+          ghost.targetY = canvas.height * (0.30 + Math.random() * 0.35);
+          ghost.targetOpacity = 0.65 + Math.random() * 0.25;
+          ghost
