@@ -19,11 +19,39 @@
       font-family: 'Courier New', Courier, monospace;
     }
 
+    /* Fullscreen WebM Background Video Layer */
+    .bg-video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+    }
+
+    .bg-video.active {
+      opacity: 1;
+    }
+
     #overlay-container {
       position: relative;
       width: 100%;
       height: 100%;
       pointer-events: none;
+      z-index: 1;
     }
 
     /* Top Tote Metrics Header */
@@ -68,6 +96,16 @@
 </head>
 <body>
 
+  <!-- Fullscreen WebM Background Videos -->
+  <div class="bg-video-container">
+    <video id="video1" class="bg-video active" autoplay loop muted playsinline>
+      <source src="https://www.dropbox.com/scl/fi/3324g7gq4w6gahp1epwff/ghostface.webm?rlkey=ulv0oj20lz88y159ajsdugqyw&st=lkhxxm9x&raw=1" type="video/webm">
+    </video>
+    <video id="video2" class="bg-video" autoplay loop muted playsinline>
+      <source src="https://www.dropbox.com/scl/fi/f6y8ghlfl00jyx1ye0040/witchface.webm?rlkey=3y2ffrt15vghe6p455pfuryll&st=x9zev3fx&raw=1" type="video/webm">
+    </video>
+  </div>
+
   <div id="overlay-container">
     <canvas id="overlayCanvas"></canvas>
 
@@ -78,14 +116,30 @@
       <path d="M 30,10 Q 25,25 10,30 M 60,20 Q 50,50 20,60 M 90,30 Q 75,75 30,90 M 120,40 Q 100,100 40,120" stroke="rgba(255,255,255,0.18)" stroke-width="0.8" fill="none"/>
     </svg>
 
-    <!-- Shift Metrics Header -->
+    <!-- Shift Metrics Header (Earnings removed) -->
     <div class="header-metrics">
-      <span class="metric">HAUNTED EARNINGS: <span id="earnings-display">\$142.50</span></span>
       <span class="metric">GHOSTLY MILES: <span id="miles-display">68.4</span></span>
     </div>
   </div>
 
   <script>
+    // Video Cross-Fade Controller
+    const v1 = document.getElementById('video1');
+    const v2 = document.getElementById('video2');
+    let showingVideo1 = true;
+
+    // Cycle between ghostface and witchface every 12 seconds
+    setInterval(() => {
+      if (showingVideo1) {
+        v1.classList.remove('active');
+        v2.classList.add('active');
+      } else {
+        v2.classList.remove('active');
+        v1.classList.add('active');
+      }
+      showingVideo1 = !showingVideo1;
+    }, 12000);
+
     const canvas = document.getElementById('overlayCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -209,110 +263,7 @@
       }
     }
 
-    // 4. Fast Swooping Flying Witch Silhouette
-    const witch = {
-      x: -120,
-      y: 120,
-      vx: 0,
-      vy: 0,
-      scale: 0.85,
-      active: false,
-      timer: 0
-    };
-
-    function triggerWitch() {
-      if (!witch.active && Math.random() < 0.02) {
-        witch.active = true;
-        witch.x = -120;
-        witch.y = 80 + Math.random() * 140;
-        witch.vx = 7 + Math.random() * 5; // Fast flight
-        witch.vy = (Math.random() - 0.5) * 1.2;
-      }
-    }
-
-    function drawWitch() {
-      triggerWitch();
-
-      if (!witch.active) return;
-
-      witch.x += witch.vx;
-      witch.y += witch.vy + Math.sin(witch.x * 0.02) * 1.2; // Arc undulating wave flight
-
-      if (witch.x > canvas.width + 120) {
-        witch.active = false;
-        return;
-      }
-
-      ctx.save();
-      ctx.translate(witch.x, witch.y);
-      ctx.scale(witch.scale, witch.scale);
-
-      // Dark silhouette color
-      ctx.fillStyle = 'rgba(15, 16, 20, 0.88)';
-
-      // --- Broom Stick ---
-      ctx.beginPath();
-      ctx.rect(-50, 8, 90, 3);
-      ctx.fill();
-
-      // Broom Bristles / Tail
-      ctx.beginPath();
-      ctx.moveTo(-50, 9);
-      ctx.lineTo(-75, 1);
-      ctx.lineTo(-78, 16);
-      ctx.closePath();
-      ctx.fill();
-
-      // --- Witch Body ---
-      // Dress / Cloak
-      ctx.beginPath();
-      ctx.moveTo(-15, 8);
-      ctx.lineTo(-30, 25);
-      ctx.lineTo(5, 22);
-      ctx.closePath();
-      ctx.fill();
-
-      // Head
-      ctx.beginPath();
-      ctx.arc(0, -8, 7, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Pointy Nose & Chin Silhouette
-      ctx.beginPath();
-      ctx.moveTo(4, -8);
-      ctx.lineTo(12, -6);
-      ctx.lineTo(5, -3);
-      ctx.closePath();
-      ctx.fill();
-
-      // --- Pointed Witch Hat ---
-      // Hat Brim
-      ctx.beginPath();
-      ctx.ellipse(0, -13, 16, 3, -0.15, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Pointy Hat Cone
-      ctx.beginPath();
-      ctx.moveTo(-8, -14);
-      ctx.lineTo(12, -38);
-      ctx.lineTo(6, -14);
-      ctx.closePath();
-      ctx.fill();
-
-      // --- Black Cat Sitting on Back of Broom ---
-      ctx.beginPath();
-      ctx.arc(-34, 3, 4, 0, Math.PI * 2); // Body
-      ctx.arc(-34, -2, 3, 0, Math.PI * 2); // Head
-      ctx.fill();
-
-      // Glowing Green Cat Eye
-      ctx.fillStyle = '#00ff88';
-      ctx.fillRect(-33, -3, 1, 1);
-
-      ctx.restore();
-    }
-
-    // 5. Bat Swarm
+    // 4. Bat Swarm
     const bats = [];
     function spawnBat() {
       if (bats.length < 5 && Math.random() < 0.05) {
@@ -358,7 +309,7 @@
       }
     }
 
-    // 6. Crawling & Swaying Spider
+    // 5. Crawling & Swaying Spider
     const spider = {
       x: 140,
       y: 40,
@@ -549,10 +500,7 @@
       // 4. Bats
       animateBats();
 
-      // 5. Flying Witch
-      drawWitch();
-
-      // 6. Screaming Ghost
+      // 5. Screaming Ghost
       drawApparition(time);
 
       requestAnimationFrame(loop);
